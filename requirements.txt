@@ -1,0 +1,14 @@
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Bcrypt==1.0.1
+Flask-Mail==0.9.1
+Werkzeug==3.0.4
+Jinja2==3.1.4
+click==8.1.7
+itsdangerous==2.2.0
+MarkupSafe==2.1.5
+SQLAlchemy==2.0.35
+bcrypt==4.2.0
+blinker==1.8.2
+python-dotenv==1.0.1
+gunicorn==21.2.0

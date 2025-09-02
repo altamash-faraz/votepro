@@ -1,0 +1,431 @@
+{% extends "base.html" %} {% block title %}{{ poll.title }} - VotePro{% endblock
+%} {% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <!-- Poll Header -->
+      <div class="card poll-card mb-4">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="category-badge">{{ poll.category }}</span>
+            <small class="text-white-50">
+              <i class="fas fa-calendar me-1"></i>
+              {{ poll.created_at.strftime('%B %d, %Y') }}
+            </small>
+          </div>
+          <h2 class="card-title mb-0">{{ poll.title }}</h2>
+        </div>
+        <div class="card-body">
+          <p class="lead text-muted mb-3">{{ poll.description }}</p>
+
+          <div class="row text-center mb-4">
+            <div class="col-4">
+              <div class="fw-bold text-primary fs-4">{{ total_votes }}</div>
+              <small class="text-muted">Total Votes</small>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold text-success fs-4">
+                {{ poll.options|length }}
+              </div>
+              <small class="text-muted">Options</small>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold text-info fs-4" id="timeLeft">
+                <i class="fas fa-clock me-1"></i>
+                <span id="countdown"></span>
+              </div>
+              <small class="text-muted">Time Left</small>
+            </div>
+          </div>
+
+          <div class="text-center mb-3">
+            <small class="text-muted">
+              <i class="fas fa-user me-1"></i>
+              Created by {{ poll.creator.email }}
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voting Section - UPDATED TEMPLATE -->
+      {% if session.user_id and is_poll_active_for_voting %}
+      <div class="card mb-4" id="votingSection">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-vote-yea me-2"></i>Cast Your Vote
+          </h4>
+        </div>
+        <div class="card-body">
+          <form id="votingForm">
+            <div class="mb-3">
+              <p class="fw-semibold">Select your choice:</p>
+              {% for option in poll.options %}
+              <div class="vote-option">
+                <input
+                  type="radio"
+                  name="option_id"
+                  value="{{ option.id }}"
+                  id="option{{ option.id }}"
+                  required
+                />
+                <label for="option{{ option.id }}" class="fw-semibold"
+                  >{{ option.option_text }}</label
+                >
+              </div>
+              {% endfor %}
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success btn-lg">
+                <i class="fas fa-paper-plane me-2"></i>Submit Vote
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% elif not session.user_id %}
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Login Required:</strong> Please
+        <a href="{{ url_for('login') }}" class="alert-link">login</a> to vote in
+        this poll.
+      </div>
+      {% elif not is_poll_active_for_voting %}
+      <div class="alert alert-danger">
+        <i class="fas fa-ban me-2"></i>
+        <strong>Poll Closed:</strong> This poll is no longer accepting votes.
+      </div>
+      {% endif %}
+
+      <!-- Results Section -->
+      <div class="results-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="fw-bold">
+            <i class="fas fa-chart-pie me-2"></i>Live Results
+          </h3>
+          <div class="d-flex gap-2">
+            <button
+              class="btn btn-outline-primary btn-sm"
+              onclick="toggleChartType()"
+            >
+              <i class="fas fa-exchange-alt me-1"></i>Switch View
+            </button>
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              onclick="refreshResults()"
+            >
+              <i class="fas fa-refresh me-1"></i>Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Chart Container -->
+        <div class="chart-container mb-4">
+          <canvas id="resultsChart"></canvas>
+        </div>
+
+        <!-- Detailed Results -->
+        <div class="row">
+          {% for result in results %}
+          <div class="col-md-6 mb-3">
+            <div class="card h-100">
+              <div class="card-body">
+                <h6 class="card-title">{{ result.option.option_text }}</h6>
+                <div class="progress mb-2">
+                  <div
+                    class="progress-bar"
+                    role="progressbar"
+                    style="width: {{ result.percentage }}%"
+                  >
+                    {{ result.percentage }}%
+                  </div>
+                </div>
+                <small class="text-muted">
+                  {{ result.count }} vote{{ 's' if result.count != 1 else '' }}
+                </small>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if total_votes > 0 %}
+        <div class="text-center mt-4">
+          <button class="btn btn-outline-primary" onclick="exportResults()">
+            <i class="fas fa-download me-2"></i>Export Results
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OTP Verification Modal -->
+<div
+  class="modal fade"
+  id="otpModal"
+  tabindex="-1"
+  aria-labelledby="otpModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="otpModalLabel">
+          <i class="fas fa-shield-alt me-2"></i>Verify Your Vote
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="mb-4">
+          <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
+          <p>
+            We've sent a verification code to your email. Enter it below to
+            confirm your vote.
+          </p>
+        </div>
+
+        <form id="otpVerificationForm">
+          <input type="hidden" id="selectedOptionId" name="option_id" />
+          <div class="mb-3">
+            <label for="otpCode" class="form-label fw-semibold"
+              >Verification Code</label
+            >
+            <input
+              type="text"
+              class="form-control otp-input text-center"
+              id="otpCode"
+              name="otp"
+              maxlength="6"
+              placeholder="000000"
+              required
+            />
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-check me-2"></i>Confirm Vote
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              onclick="resendOTP()"
+            >
+              <i class="fas fa-redo me-2"></i>Resend Code
+            </button>
+          </div>
+        </form>
+
+        <!-- Demo notice -->
+        <div class="alert alert-info mt-3 small">
+          <i class="fas fa-info-circle me-1"></i>
+          <strong>Demo:</strong> Check browser console for OTP code
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  let currentChart = null;
+  let chartType = 'pie';
+
+  // Initialize countdown
+  function updateCountdown() {
+      const deadline = new Date('{{ poll.deadline.strftime("%Y-%m-%d %H:%M:%S") }}');
+      const now = new Date();
+      const timeDiff = deadline - now;
+
+      if (timeDiff > 0) {
+          const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+          let countdownText = '';
+          if (days > 0) countdownText += `${days}d `;
+          if (hours > 0) countdownText += `${hours}h `;
+          countdownText += `${minutes}m`;
+
+          document.getElementById('countdown').textContent = countdownText;
+          setTimeout(updateCountdown, 60000); // Update every minute
+      } else {
+          document.getElementById('countdown').textContent = 'Ended';
+          document.getElementById('timeLeft').innerHTML = '<i class="fas fa-ban text-danger"></i> Ended';
+      }
+  }
+
+  // Initialize chart
+  function initializeChart() {
+      const ctx = document.getElementById('resultsChart').getContext('2d');
+      const data = {
+          labels: [{% for result in results %}'{{ result.option.option_text }}'{% if not loop.last %},{% endif %}{% endfor %}],
+          datasets: [{
+              data: [{% for result in results %}{{ result.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+              backgroundColor: [
+                  '#3498db', '#2ecc71', '#e74c3c', '#f39c12',
+                  '#9b59b6', '#1abc9c', '#e67e22', '#34495e'
+              ].slice(0, {{ results|length }})
+          }]
+      };
+
+      currentChart = new Chart(ctx, {
+          type: chartType,
+          data: data,
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  legend: {
+                      position: chartType === 'pie' ? 'right' : 'top'
+                  }
+              }
+          }
+      });
+  }
+
+  function toggleChartType() {
+      chartType = chartType === 'pie' ? 'bar' : 'pie';
+      currentChart.destroy();
+      initializeChart();
+  }
+
+  function refreshResults() {
+      location.reload();
+  }
+
+  function exportResults() {
+      const pollData = {
+          title: '{{ poll.title }}',
+          category: '{{ poll.category }}',
+          total_votes: {{ total_votes }},
+          results: [
+              {% for result in results %}
+              {
+                  option: '{{ result.option.option_text }}',
+                  votes: {{ result.count }},
+                  percentage: {{ result.percentage }}
+              }{% if not loop.last %},{% endif %}
+              {% endfor %}
+          ]
+      };
+
+      const dataStr = JSON.stringify(pollData, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'poll_results_{{ poll.id }}.json';
+      link.click();
+  }
+
+  // Voting functionality
+  document.addEventListener('DOMContentLoaded', function() {
+      updateCountdown();
+      if (document.getElementById('resultsChart')) {
+          initializeChart();
+      }
+
+      const votingForm = document.getElementById('votingForm');
+      if (votingForm) {
+          votingForm.addEventListener('submit', async function(e) {
+              e.preventDefault();
+
+              const selectedOption = document.querySelector('input[name="option_id"]:checked');
+              if (!selectedOption) {
+                  alert('Please select an option to vote');
+                  return;
+              }
+
+              try {
+                  const response = await fetch('/vote/{{ poll.id }}', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      }
+                  });
+
+                  const data = await response.json();
+
+                  if (data.success) {
+                      // Show OTP modal
+                      document.getElementById('selectedOptionId').value = selectedOption.value;
+                      const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+                      otpModal.show();
+                  } else {
+                      alert(data.message);
+                  }
+              } catch (error) {
+                  console.error('Error:', error);
+                  alert('An error occurred while initiating vote');
+              }
+          });
+      }
+
+      // OTP Verification
+      const otpForm = document.getElementById('otpVerificationForm');
+      if (otpForm) {
+          otpForm.addEventListener('submit', async function(e) {
+              e.preventDefault();
+
+              const formData = new FormData(this);
+              const otpData = {
+                  poll_id: {{ poll.id }},
+                  option_id: parseInt(formData.get('option_id')),
+                  otp: formData.get('otp')
+              };
+
+              try {
+                  const response = await fetch('/verify-vote', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(otpData)
+                  });
+
+                  const data = await response.json();
+
+                  if (data.success) {
+                      alert('Vote cast successfully!');
+                      location.reload();
+                  } else {
+                      alert(data.message);
+                  }
+              } catch (error) {
+                  console.error('Error:', error);
+                  alert('An error occurred while verifying vote');
+              }
+          });
+      }
+  });
+
+  function resendOTP() {
+      // Simulate resending OTP
+      alert('New verification code sent! Check your email (or browser console in demo mode).');
+
+      // Generate and show new OTP in console for demo
+      const newOTP = Math.floor(100000 + Math.random() * 900000);
+      console.log(`\n=== VOTING OTP ===`);
+      console.log(`Verification Code: ${newOTP}`);
+      console.log('==================\n');
+  }
+
+  // Auto-refresh results every 30 seconds
+  setInterval(() => {
+      if (currentChart) {
+          fetch('/api/poll-results/{{ poll.id }}')
+              .then(response => response.json())
+              .then(data => {
+                  currentChart.data.datasets[0].data = data.results.map(r => r.count);
+                  currentChart.update();
+              })
+              .catch(error => console.error('Error refreshing results:', error));
+      }
+  }, 30000);
+</script>
+{% endblock %}

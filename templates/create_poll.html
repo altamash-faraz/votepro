@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+
+{% block title %}Create Poll - VotePro{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Create New Poll
+                    </h2>
+                    <p class="text-muted mb-0">Create a poll to gather opinions from your community</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="createPollForm" novalidate>
+                        <!-- Poll Title -->
+                        <div class="mb-4">
+                            <label for="title" class="form-label fw-semibold">
+                                <i class="fas fa-heading me-2"></i>Poll Title
+                            </label>
+                            <input type="text" class="form-control" id="title" name="title" required 
+                                   placeholder="Enter a clear and concise title for your poll" maxlength="200">
+                            <div class="invalid-feedback">
+                                Please provide a poll title.
+                            </div>
+                            <div class="form-text">
+                                <span id="titleCount">0</span>/200 characters
+                            </div>
+                        </div>
+
+                        <!-- Poll Description -->
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-semibold">
+                                <i class="fas fa-align-left me-2"></i>Description
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="4" 
+                                      placeholder="Provide additional details about your poll (optional)"></textarea>
+                            <div class="form-text">
+                                Help voters understand what they're voting on
+                            </div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-4">
+                            <label for="category" class="form-label fw-semibold">
+                                <i class="fas fa-tags me-2"></i>Category
+                            </label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Workplace">Workplace</option>
+                                <option value="Education">Education</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Politics">Politics</option>
+                                <option value="Health">Health</option>
+                                <option value="Environment">Environment</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a category for your poll.
+                            </div>
+                        </div>
+
+                        <!-- Poll Deadline -->
+                        <div class="mb-4">
+                            <label for="deadline" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-alt me-2"></i>Poll Deadline
+                            </label>
+                            <input type="datetime-local" class="form-control" id="deadline" name="deadline" required>
+                            <div class="invalid-feedback">
+                                Please set a deadline for your poll.
+                            </div>
+                            <div class="form-text">
+                                Choose when voting should end
+                            </div>
+                        </div>
+
+                        <!-- Poll Options -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-list me-2"></i>Poll Options
+                            </label>
+                            <div id="pollOptions">
+                                <div class="option-input mb-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text">1</span>
+                                        <input type="text" class="form-control" name="options[]" required 
+                                               placeholder="Enter first option" maxlength="200">
+                                        <button class="btn btn-outline-danger" type="button" onclick="removeOption(this)" style="display: none;">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="option-input mb-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text">2</span>
+                                        <input type="text" class="form-control" name="options[]" required 
+                                               placeholder="Enter second option" maxlength="200">
+                                        <button class="btn btn-outline-danger" type="button" onclick="removeOption(this)" style="display: none;">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addOption()">
+                                    <i class="fas fa-plus me-1"></i>Add Option
+                                </button>
+                                <small class="text-muted">
+                                    <span id="optionCount">2</span>/10 options
+                                </small>
+                            </div>
+                            
+                            <div class="form-text">
+                                Add at least 2 options (maximum 10)
+                            </div>
+                        </div>
+
+                        <!-- Poll Settings -->
+                        <div class="mb-4">
+                            <h5 class="fw-semibold mb-3">
+                                <i class="fas fa-cog me-2"></i>Poll Settings
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" id="allowAnonymous" checked disabled>
+                                        <label class="form-check-label" for="allowAnonymous">
+                                            Anonymous Voting
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">Votes are always anonymous for privacy</small>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" id="requireVerification" checked disabled>
+                                        <label class="form-check-label" for="requireVerification">
+                                            Email Verification
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">OTP verification prevents duplicate votes</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="button" class="btn btn-outline-primary me-md-2" onclick="previewPoll()">
+                                <i class="fas fa-eye me-2"></i>Preview
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check me-2"></i>Create Poll
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">
+                    <i class="fas fa-eye me-2"></i>Poll Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="previewContent">
+                <!-- Preview content will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Edit</button>
+                <button type="button" class="btn btn-primary" onclick="submitPoll()">Create Poll</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let optionCounter = 2;
+
+function addOption() {
+    if (optionCounter >= 10) {
+        alert('Maximum 10 options allowed');
+        return;
+    }
+    
+    optionCounter++;
+    const optionsContainer = document.getElementById('pollOptions');
+    const newOption = document.createElement('div');
+    newOption.className = 'option-input mb-2';
+    newOption.innerHTML = `
+        <div class="input-group">
+            <span class="input-group-text">${optionCounter}</span>
+            <input type="text" class="form-control" name="options[]" required 
+                   placeholder="Enter option ${optionCounter}" maxlength="200">
+            <button class="btn btn-outline-danger" type="button" onclick="removeOption(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    optionsContainer.appendChild(newOption);
+    updateOptionNumbers();
+    
+    // Show remove buttons if more than 2 options
+    if (optionCounter > 2) {
+        document.querySelectorAll('.option-input .btn-outline-danger').forEach(btn => {
+            btn.style.display = 'block';
+        });
+    }
+}
+
+function removeOption(button) {
+    if (optionCounter <= 2) {
+        alert('Minimum 2 options required');
+        return;
+    }
+    
+    button.closest('.option-input').remove();
+    optionCounter--;
+    updateOptionNumbers();
+    
+    // Hide remove buttons if only 2 options left
+    if (optionCounter <= 2) {
+        document.querySelectorAll('.option-input .btn-outline-danger').forEach(btn => {
+            btn.style.display = 'none';
+        });
+    }
+}
+
+function updateOptionNumbers() {
+    const options = document.querySelectorAll('.option-input');
+    options.forEach((option, index) => {
+        const numberSpan = option.querySelector('.input-group-text');
+        const input = option.querySelector('input');
+        numberSpan.textContent = index + 1;
+        input.placeholder = `Enter option ${index + 1}`;
+    });
+    
+    document.getElementById('optionCount').textContent = optionCounter;
+}
+
+function previewPoll() {
+    const form = document.getElementById('createPollForm');
+    const formData = new FormData(form);
+    
+    // Validate form first
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    // Get all options
+    const options = Array.from(formData.getAll('options[]')).filter(opt => opt.trim());
+    if (options.length < 2) {
+        alert('Please provide at least 2 options');
+        return;
+    }
+    
+    // Generate preview content
+    const previewContent = `
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="category-badge">${formData.get('category')}</span>
+                    <small class="text-white-50">Preview</small>
+                </div>
+                <h4 class="card-title mb-0">${formData.get('title')}</h4>
+            </div>
+            <div class="card-body">
+                ${formData.get('description') ? `<p class="text-muted mb-3">${formData.get('description')}</p>` : ''}
+                
+                <div class="mb-3">
+                    <p class="fw-semibold">Options:</p>
+                    ${options.map((option, index) => `
+                        <div class="vote-option">
+                            <input type="radio" name="preview_option" id="preview_${index}" disabled>
+                            <label for="preview_${index}" class="fw-semibold">${option}</label>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="fw-bold text-primary">0</div>
+                        <small class="text-muted">Votes</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-success">${options.length}</div>
+                        <small class="text-muted">Options</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-info">
+                            <i class="fas fa-clock me-1"></i>
+                            ${new Date(formData.get('deadline')).toLocaleDateString()}
+                        </div>
+                        <small class="text-muted">Deadline</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('previewContent').innerHTML = previewContent;
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+}
+
+function submitPoll() {
+    document.getElementById('createPollForm').submit();
+}
+
+// Form validation and character counting
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('createPollForm');
+    const titleInput = document.getElementById('title');
+    const deadlineInput = document.getElementById('deadline');
+    
+    // Set minimum deadline to current date/time
+    const now = new Date();
+    const minDate = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+    deadlineInput.min = minDate.toISOString().slice(0, 16);
+    
+    // Title character counting
+    titleInput.addEventListener('input', function() {
+        document.getElementById('titleCount').textContent = this.value.length;
+    });
+    
+    // Form validation
+    form.addEventListener('submit', function(event) {
+        let isValid = true;
+        
+        // Validate title
+        if (!titleInput.value.trim()) {
+            titleInput.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            titleInput.classList.remove('is-invalid');
+            titleInput.classList.add('is-valid');
+        }
+        
+        // Validate category
+        const categorySelect = document.getElementById('category');
+        if (!categorySelect.value) {
+            categorySelect.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            categorySelect.classList.remove('is-invalid');
+            categorySelect.classList.add('is-valid');
+        }
+        
+        // Validate deadline
+        const deadlineDate = new Date(deadlineInput.value);
+        const minDeadline = new Date(now.getTime() + 60 * 60 * 1000);
+        if (!deadlineInput.value || deadlineDate < minDeadline) {
+            deadlineInput.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            deadlineInput.classList.remove('is-invalid');
+            deadlineInput.classList.add('is-valid');
+        }
+        
+        // Validate options
+        const optionInputs = document.querySelectorAll('input[name="options[]"]');
+        const validOptions = Array.from(optionInputs).filter(input => input.value.trim());
+        
+        optionInputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            }
+        });
+        
+        if (validOptions.length < 2) {
+            alert('Please provide at least 2 options');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            // Show loading state
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating Poll...';
+        }
+        
+        form.classList.add('was-validated');
+    });
+    
+    // Real-time validation
+    titleInput.addEventListener('input', function() {
+        if (this.value.trim()) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+    
+    document.getElementById('category').addEventListener('change', function() {
+        if (this.value) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+    
+    deadlineInput.addEventListener('change', function() {
+        const deadlineDate = new Date(this.value);
+        const minDeadline = new Date(now.getTime() + 60 * 60 * 1000);
+        if (this.value && deadlineDate >= minDeadline) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+});
+</script>
+{% endblock %}

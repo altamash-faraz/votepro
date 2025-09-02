@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-vote-yea me-3"></i>
+                    Welcome to VotePro
+                </h1>
+                <p class="lead mb-4">
+                    Your trusted platform for transparent, secure, and user-friendly online voting. 
+                    Create polls, gather opinions, and make data-driven decisions with confidence.
+                </p>
+                {% if not session.user_id %}
+                <div class="hero-buttons">
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">
+                        <i class="fas fa-user-plus me-2"></i>Get Started
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                </div>
+                {% else %}
+                <div class="hero-buttons">
+                    <a href="{{ url_for('create_poll') }}" class="btn btn-light btn-lg me-3">
+                        <i class="fas fa-plus me-2"></i>Create New Poll
+                    </a>
+                    <a href="{{ url_for('my_polls') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-list me-2"></i>My Polls
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="stats-card">
+                    <div class="stats-number">{{ poll_stats|length }}</div>
+                    <h5>Active Polls</h5>
+                    <p class="text-muted mb-0">Join the conversation</p>
+                </div>
+                <div class="stats-card">
+                    {% set total_votes = poll_stats|sum(attribute='vote_count') %}
+                    <div class="stats-number">{{ total_votes }}</div>
+                    <h5>Total Votes Cast</h5>
+                    <p class="text-muted mb-0">Voices heard</p>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number">{{ categories|length }}</div>
+                    <h5>Categories</h5>
+                    <p class="text-muted mb-0">Topics covered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Polls Section -->
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">
+                    <i class="fas fa-fire me-2 text-danger"></i>
+                    Active Polls
+                </h2>
+                <div class="d-flex gap-2">
+                    <select class="form-select" id="categoryFilter" style="width: auto;">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if poll_stats %}
+    <div class="row" id="pollsContainer">
+        {% for item in poll_stats %}
+        {% set poll = item.poll %}
+        {% set vote_count = item.vote_count %}
+        <div class="col-lg-6 col-xl-4 mb-4 poll-item" data-category="{{ poll.category }}">
+            <div class="card poll-card h-100">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="category-badge">{{ poll.category }}</span>
+                        <small class="text-white-50">
+                            <i class="fas fa-calendar me-1"></i>
+                            {{ poll.created_at.strftime('%b %d, %Y') }}
+                        </small>
+                    </div>
+                    <h5 class="card-title mb-0">{{ poll.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-muted mb-3">
+                        {{ poll.description[:100] }}{% if poll.description|length > 100 %}...{% endif %}
+                    </p>
+                    
+                    <div class="poll-stats mb-3">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="fw-bold text-primary">{{ vote_count }}</div>
+                                <small class="text-muted">Votes</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="fw-bold text-success">{{ poll.options|length }}</div>
+                                <small class="text-muted">Options</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            Ends: {{ poll.deadline.strftime('%b %d, %Y at %I:%M %p') }}
+                        </small>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('view_poll', poll_id=poll.id) }}" class="btn btn-primary">
+                            <i class="fas fa-eye me-2"></i>View Poll
+                        </a>
+                        {% if session.user_id and poll.is_active %}
+                        <button class="btn btn-outline-success btn-sm" onclick="initializeVote({{ poll.id }})">
+                            <i class="fas fa-vote-yea me-1"></i>Vote Now
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <small class="text-muted">
+                        <i class="fas fa-user me-1"></i>
+                        Created by {{ poll.creator.email }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h4>No Active Polls</h4>
+                <p class="text-muted mb-4">Be the first to create a poll and start gathering opinions!</p>
+                {% if session.user_id %}
+                <a href="{{ url_for('create_poll') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Create First Poll
+                </a>
+                {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Join VotePro
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Features Section -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h2 class="fw-bold">Why Choose VotePro?</h2>
+            <p class="text-muted">Powerful features for transparent and secure voting</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <h5>Secure & Anonymous</h5>
+                    <p class="text-muted">Advanced security measures ensure vote integrity while maintaining voter anonymity.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-chart-pie fa-3x text-success mb-3"></i>
+                    <h5>Real-time Results</h5>
+                    <p class="text-muted">Watch results update live with beautiful charts and detailed analytics.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-mobile-alt fa-3x text-info mb-3"></i>
+                    <h5>Mobile Friendly</h5>
+                    <p class="text-muted">Responsive design works perfectly on all devices - desktop, tablet, and mobile.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Voting Modal -->
+<div class="modal fade" id="votingModal" tabindex="-1" aria-labelledby="votingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="votingModalLabel">
+                    <i class="fas fa-vote-yea me-2"></i>Cast Your Vote
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="votingModalBody">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Category filtering
+document.getElementById('categoryFilter').addEventListener('change', function() {
+    const selectedCategory = this.value;
+    const pollItems = document.querySelectorAll('.poll-item');
+    
+    pollItems.forEach(item => {
+        if (selectedCategory === '' || item.dataset.category === selectedCategory) {
+            item.style.display = 'block';
+            item.classList.add('fade-in');
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+// Voting functionality
+async function initializeVote(pollId) {
+    {% if not session.user_id %}
+    alert('Please login to vote');
+    window.location.href = "{{ url_for('login') }}";
+    return;
+    {% endif %}
+    
+    try {
+        const response = await fetch(`/vote/${pollId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show OTP verification modal
+            showOTPModal(pollId);
+            alert(data.message);
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while initiating vote');
+    }
+}
+
+function showOTPModal(pollId) {
+    // Redirect to poll page for voting
+    window.location.href = `/poll/${pollId}`;
+}
+
+// Add fade-in animation class
+document.addEventListener('DOMContentLoaded', function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,403 @@
+{% extends "base.html" %} {% block title %}My Polls - VotePro{% endblock %} {%
+block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0"><i class="fas fa-list me-2"></i>My Polls</h2>
+      <p class="text-muted mb-0">
+        Manage your created polls and view analytics
+      </p>
+    </div>
+    <a href="{{ url_for('create_poll') }}" class="btn btn-primary">
+      <i class="fas fa-plus me-2"></i>Create New Poll
+    </a>
+  </div>
+
+  {% if poll_stats %}
+  <div class="row">
+    {% for item in poll_stats %} {% set poll = item.poll %} {% set vote_count =
+    item.vote_count %} {% set is_active = item.is_active %} {% set is_expired =
+    item.is_expired %} {% set days_left = item.days_left %}
+    <div class="col-lg-6 col-xl-4 mb-4">
+      <div
+        class="card poll-card h-100 {% if not is_active %}opacity-75{% endif %}"
+      >
+        <div class="card-header {% if not is_active %}bg-secondary{% endif %}">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="category-badge">{{ poll.category }}</span>
+            <div class="dropdown">
+              <button
+                class="btn btn-sm btn-outline-light"
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{ url_for('view_poll', poll_id=poll.id) }}"
+                  >
+                    <i class="fas fa-eye me-2"></i>View Poll
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{ url_for('toggle_poll', poll_id=poll.id) }}"
+                  >
+                    <i
+                      class="fas fa-{% if is_active %}pause{% else %}play{% endif %} me-2"
+                    ></i>
+                    {% if is_active %}Deactivate{% else %}Activate{% endif %}
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a
+                    class="dropdown-item text-danger"
+                    href="#"
+                    onclick="confirmDelete({{ poll.id }})"
+                  >
+                    <i class="fas fa-trash me-2"></i>Delete Poll
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <h5 class="card-title mb-0">{{ poll.title }}</h5>
+          {% if not is_active %}
+          <small class="text-white-50">
+            <i class="fas fa-pause-circle me-1"></i>
+            {% if is_expired %}Ended{% else %}Inactive{% endif %}
+          </small>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          <p class="card-text text-muted mb-3">
+            {{ poll.description[:80] }}{% if poll.description and
+            poll.description|length > 80 %}...{% endif %}
+          </p>
+
+          <!-- Poll Statistics -->
+          <div class="row text-center mb-3">
+            <div class="col-4">
+              <div class="fw-bold text-primary fs-5">{{ vote_count }}</div>
+              <small class="text-muted">Votes</small>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold text-success fs-5">
+                {{ poll.options|length }}
+              </div>
+              <small class="text-muted">Options</small>
+            </div>
+            <div class="col-4">
+              {% if days_left > 0 %}
+              <div class="fw-bold text-info fs-5">{{ days_left }}</div>
+              <small class="text-muted">Days Left</small>
+              {% else %}
+              <div class="fw-bold text-danger fs-5">
+                <i class="fas fa-ban"></i>
+              </div>
+              <small class="text-muted">Ended</small>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Progress Bar for Engagement -->
+          <div class="mb-3">
+            {% set engagement_score = [vote_count * 10, 100] | min %}
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <small class="text-muted">Engagement</small>
+              <small class="text-muted">{{ engagement_score }}%</small>
+            </div>
+            <div class="progress" style="height: 8px">
+              <div
+                class="progress-bar"
+                style="width: {{ engagement_score }}%"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Poll Details -->
+          <div class="mb-3">
+            <small class="text-muted d-block">
+              <i class="fas fa-calendar me-1"></i>
+              Created: {{ poll.created_at.strftime('%b %d, %Y') }}
+            </small>
+            <small class="text-muted d-block">
+              <i class="fas fa-clock me-1"></i>
+              Deadline: {{ poll.deadline.strftime('%b %d, %Y at %I:%M %p') }}
+            </small>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-grid gap-2">
+            <a
+              href="{{ url_for('view_poll', poll_id=poll.id) }}"
+              class="btn btn-primary btn-sm"
+            >
+              <i class="fas fa-chart-bar me-2"></i>View Results
+            </a>
+            <div class="btn-group" role="group">
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                onclick="sharePoll({{ poll.id }})"
+              >
+                <i class="fas fa-share me-1"></i>Share
+              </button>
+              <button
+                class="btn btn-outline-info btn-sm"
+                onclick="exportPollData({{ poll.id }})"
+              >
+                <i class="fas fa-download me-1"></i>Export
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent">
+          {% if is_active %}
+          <small class="text-success">
+            <i class="fas fa-circle me-1"></i>Active
+          </small>
+          {% else %}
+          <small class="text-muted">
+            <i class="fas fa-pause-circle me-1"></i>Inactive
+          </small>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Analytics Summary -->
+  <div class="row mt-5">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">
+            <i class="fas fa-chart-line me-2"></i>Your Polling Statistics
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-3 mb-3">
+              <div class="stats-card border">
+                <div class="stats-number text-primary">
+                  {{ poll_stats|length }}
+                </div>
+                <h6>Total Polls</h6>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="stats-card border">
+                {% set active_polls =
+                poll_stats|selectattr('is_active')|list|length %}
+                <div class="stats-number text-success">{{ active_polls }}</div>
+                <h6>Active Polls</h6>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="stats-card border">
+                {% set total_votes = poll_stats|sum(attribute='vote_count') %}
+                <div class="stats-number text-info">{{ total_votes }}</div>
+                <h6>Total Votes Received</h6>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="stats-card border">
+                {% set avg_votes = (total_votes / poll_stats|length) if
+                poll_stats|length > 0 else 0 %}
+                <div class="stats-number text-warning">
+                  {{ "%.1f"|format(avg_votes) }}
+                </div>
+                <h6>Average Votes per Poll</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="row">
+    <div class="col-12">
+      <div class="text-center py-5">
+        <i class="fas fa-poll fa-4x text-muted mb-4"></i>
+        <h3>No Polls Yet</h3>
+        <p class="text-muted mb-4">
+          You haven't created any polls yet. Start engaging with your community
+          by creating your first poll!
+        </p>
+        <a href="{{ url_for('create_poll') }}" class="btn btn-primary btn-lg">
+          <i class="fas fa-plus me-2"></i>Create Your First Poll
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Share Modal -->
+<div
+  class="modal fade"
+  id="shareModal"
+  tabindex="-1"
+  aria-labelledby="shareModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="shareModalLabel">
+          <i class="fas fa-share me-2"></i>Share Poll
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="shareUrl" class="form-label">Poll URL</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="shareUrl" readonly />
+            <button
+              class="btn btn-outline-primary"
+              onclick="copyToClipboard('shareUrl')"
+            >
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button class="btn btn-primary" onclick="shareOnSocial('twitter')">
+            <i class="fab fa-twitter me-2"></i>Share on Twitter
+          </button>
+          <button class="btn btn-primary" onclick="shareOnSocial('facebook')">
+            <i class="fab fa-facebook me-2"></i>Share on Facebook
+          </button>
+          <button class="btn btn-success" onclick="shareOnSocial('whatsapp')">
+            <i class="fab fa-whatsapp me-2"></i>Share on WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  function sharePool(pollId) {
+    const pollUrl = `${window.location.origin}/poll/${pollId}`;
+    document.getElementById("shareUrl").value = pollUrl;
+    const shareModal = new bootstrap.Modal(
+      document.getElementById("shareModal")
+    );
+    shareModal.show();
+  }
+
+  function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.select();
+    element.setSelectionRange(0, 99999); // For mobile devices
+
+    navigator.clipboard.writeText(element.value).then(function () {
+      // Create temporary success message
+      const button = event.target.closest("button");
+      const originalHTML = button.innerHTML;
+      button.innerHTML = '<i class="fas fa-check"></i>';
+      button.classList.remove("btn-outline-primary");
+      button.classList.add("btn-success");
+
+      setTimeout(() => {
+        button.innerHTML = originalHTML;
+        button.classList.remove("btn-success");
+        button.classList.add("btn-outline-primary");
+      }, 2000);
+    });
+  }
+
+  function shareOnSocial(platform) {
+    const pollUrl = document.getElementById("shareUrl").value;
+    const text = "Check out this poll and cast your vote!";
+
+    let shareUrl = "";
+    switch (platform) {
+      case "twitter":
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          text
+        )}&url=${encodeURIComponent(pollUrl)}`;
+        break;
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          pollUrl
+        )}`;
+        break;
+      case "whatsapp":
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(
+          text + " " + pollUrl
+        )}`;
+        break;
+    }
+
+    if (shareUrl) {
+      window.open(shareUrl, "_blank", "width=600,height=400");
+    }
+  }
+
+  function exportPollData(pollId) {
+    // Create a simple export by fetching poll data
+    fetch(`/api/poll-results/${pollId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const exportData = {
+          poll_title: data.poll_title,
+          total_votes: data.total_votes,
+          export_date: new Date().toISOString(),
+          results: data.results,
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `poll_${pollId}_results.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Error exporting data:", error);
+        alert("Error exporting poll data");
+      });
+  }
+
+  function confirmDelete(pollId) {
+    if (
+      confirm(
+        "Are you sure you want to delete this poll? This action cannot be undone."
+      )
+    ) {
+      // In a real app, this would make an API call to delete the poll
+      alert("Delete functionality would be implemented here");
+      // window.location.href = `/delete-poll/${pollId}`;
+    }
+  }
+
+  // Fix the sharePool function name
+  function sharePool(pollId) {
+    const pollUrl = `${window.location.origin}/poll/${pollId}`;
+    document.getElementById("shareUrl").value = pollUrl;
+    const shareModal = new bootstrap.Modal(
+      document.getElementById("shareModal")
+    );
+    shareModal.show();
+  }
+</script>
+{% endblock %}
