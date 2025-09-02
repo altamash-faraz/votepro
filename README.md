@@ -39,53 +39,19 @@ Try the application with these test features:
 
 ## 📸 **Screenshots**
 
-### 🏠 Homepage & Dashboard
-
 ![VotePro Homepage](screenshots/homepage.png)
-
-_Beautiful, modern interface with active polls and statistics - featuring the welcome page with gradient design and call-to-action buttons_
-
-### � Poll Creation Interface
 
 ![Create Poll](screenshots/create-poll.png)
 
-_Intuitive poll creation form with multiple options, categories, and deadline settings_
-
-### 🗳️ Voting Interface
-
 ![Voting Interface](screenshots/voting-interface.png)
-
-_Secure OTP-based voting system with real-time updates and clean option selection_
-
-### 📊 Poll Results & Analytics
 
 ![Poll Results](screenshots/poll-results.png)
 
-_Interactive charts and detailed voting analytics with real-time percentage calculations_
-
-### 📧 Email Verification System
-
 ![Email Verification](screenshots/email-verification.png)
-
-_Secure email-based OTP verification for voting with user-friendly interface_
-
-### 🎛️ User Dashboard
 
 ![User Dashboard](screenshots/dashboard.png)
 
-_Comprehensive poll management dashboard showing user's created polls and analytics_
-
-### 🔐 Authentication System
-
 ![Login & Register](screenshots/login-register.png)
-
-_Clean and secure login/registration interface with email verification_
-
-### 📱 Mobile Responsive Design
-
-![Mobile Responsive](screenshots/mobile-responsive.png)
-
-_Fully responsive design optimized for mobile devices and tablets_
 
 ---
 
