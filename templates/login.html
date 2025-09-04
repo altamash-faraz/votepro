@@ -1,200 +1,213 @@
-{% extends "base.html" %}
-
-{% block title %}Login - VotePro{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Login - VotePro{% endblock %} {%
+block content %}
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="verification-container">
-                <div class="text-center mb-4">
-                    <i class="fas fa-sign-in-alt fa-3x text-primary mb-3"></i>
-                    <h2 class="fw-bold">Welcome Back</h2>
-                    <p class="text-muted">Sign in to your VotePro account</p>
-                </div>
-
-                <form method="POST" novalidate id="loginForm">
-                    <div class="mb-3">
-                        <label for="email" class="form-label fw-semibold">
-                            <i class="fas fa-envelope me-2"></i>Email Address
-                        </label>
-                        <input type="email" class="form-control" id="email" name="email" required 
-                               placeholder="Enter your email address">
-                        <div class="invalid-feedback">
-                            Please provide a valid email address.
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label fw-semibold">
-                            <i class="fas fa-lock me-2"></i>Password
-                        </label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="password" name="password" required 
-                                   placeholder="Enter your password">
-                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
-                                <i class="fas fa-eye" id="passwordToggleIcon"></i>
-                            </button>
-                        </div>
-                        <div class="invalid-feedback">
-                            Please provide your password.
-                        </div>
-                    </div>
-
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="rememberMe">
-                        <label class="form-check-label" for="rememberMe">
-                            Remember me
-                        </label>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
-                        </button>
-                    </div>
-                </form>
-
-                <div class="text-center mt-4">
-                    <p class="mb-0">Don't have an account? 
-                        <a href="{{ url_for('register') }}" class="text-primary fw-semibold text-decoration-none">
-                            Sign up here
-                        </a>
-                    </p>
-                </div>
-
-                <div class="text-center mt-4">
-                    <hr class="my-3">
-                    <small class="text-muted">
-                        <i class="fas fa-shield-alt me-1"></i>
-                        Your login is secured with industry-standard encryption
-                    </small>
-                </div>
-            </div>
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="verification-container">
+        <div class="text-center mb-4">
+          <i class="fas fa-sign-in-alt fa-3x text-primary mb-3"></i>
+          <h2 class="fw-bold">Welcome Back</h2>
+          <p class="text-muted">Sign in to your VotePro account</p>
         </div>
+
+        <form method="POST" novalidate id="loginForm">
+          <div class="mb-3">
+            <label for="email" class="form-label fw-semibold">
+              <i class="fas fa-envelope me-2"></i>Email Address
+            </label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              required
+              placeholder="Enter your email address"
+            />
+            <div class="invalid-feedback">
+              Please provide a valid email address.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label fw-semibold">
+              <i class="fas fa-lock me-2"></i>Password
+            </label>
+            <div class="input-group">
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                required
+                placeholder="Enter your password"
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onclick="togglePassword('password')"
+              >
+                <i class="fas fa-eye" id="passwordToggleIcon"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback">Please provide your password.</div>
+          </div>
+
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="rememberMe" />
+            <label class="form-check-label" for="rememberMe">
+              Remember me
+            </label>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center mt-4">
+          <p class="mb-0">
+            Don't have an account?
+            <a
+              href="{{ url_for('register') }}"
+              class="text-primary fw-semibold text-decoration-none"
+            >
+              Sign up here
+            </a>
+          </p>
+        </div>
+
+        <div class="text-center mt-4">
+          <hr class="my-3" />
+          <small class="text-muted">
+            <i class="fas fa-shield-alt me-1"></i>
+            Your login is secured with industry-standard encryption
+          </small>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-function togglePassword(inputId) {
+  function togglePassword(inputId) {
     const passwordInput = document.getElementById(inputId);
-    const toggleIcon = document.getElementById('passwordToggleIcon');
-    
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleIcon.className = 'fas fa-eye-slash';
-    } else {
-        passwordInput.type = 'password';
-        toggleIcon.className = 'fas fa-eye';
-    }
-}
+    const toggleIcon = document.getElementById("passwordToggleIcon");
 
-function isValidEmail(email) {
-    if (!email || email.trim().length === 0) {
-        return false;
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      toggleIcon.className = "fas fa-eye-slash";
+    } else {
+      passwordInput.type = "password";
+      toggleIcon.className = "fas fa-eye";
     }
-    
+  }
+
+  function isValidEmail(email) {
+    if (!email || email.trim().length === 0) {
+      return false;
+    }
+
     // Basic format check
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email.trim())) {
-        return false;
+      return false;
     }
-    
+
     const cleanEmail = email.trim();
-    
+
     // Check for multiple @ symbols
-    if (cleanEmail.split('@').length !== 2) {
-        return false;
+    if (cleanEmail.split("@").length !== 2) {
+      return false;
     }
-    
-    const [local, domain] = cleanEmail.split('@');
-    
+
+    const [local, domain] = cleanEmail.split("@");
+
     // Local part checks
     if (local.length === 0 || local.length > 64) {
-        return false;
+      return false;
     }
-    
+
     // Domain part checks
     if (domain.length === 0 || domain.length > 255) {
-        return false;
+      return false;
     }
-    
+
     // Domain must have at least one dot
-    if (!domain.includes('.')) {
-        return false;
+    if (!domain.includes(".")) {
+      return false;
     }
-    
+
     // Domain parts check
-    const domainParts = domain.split('.');
+    const domainParts = domain.split(".");
     for (const part of domainParts) {
-        if (part.length === 0 || !/^[a-zA-Z0-9-]+$/.test(part)) {
-            return false;
-        }
+      if (part.length === 0 || !/^[a-zA-Z0-9-]+$/.test(part)) {
+        return false;
+      }
     }
-    
+
     // Last part must be at least 2 characters (TLD)
     if (domainParts[domainParts.length - 1].length < 2) {
-        return false;
+      return false;
     }
-    
-    return true;
-}
 
-// Form validation
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('loginForm');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    
-    form.addEventListener('submit', function(event) {
-        let isValid = true;
-        
-        // Email validation
-        if (!emailInput.value.trim() || !isValidEmail(emailInput.value)) {
-            emailInput.classList.add('is-invalid');
-            isValid = false;
-        } else {
-            emailInput.classList.remove('is-invalid');
-            emailInput.classList.add('is-valid');
-        }
-        
-        // Password validation
-        if (!passwordInput.value.trim()) {
-            passwordInput.classList.add('is-invalid');
-            isValid = false;
-        } else {
-            passwordInput.classList.remove('is-invalid');
-            passwordInput.classList.add('is-valid');
-        }
-        
-        if (!isValid) {
-            event.preventDefault();
-            alert('Please enter a valid email address and password.');
-        }
+    return true;
+  }
+
+  // Form validation
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("loginForm");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+
+    form.addEventListener("submit", function (event) {
+      let isValid = true;
+
+      // Email validation
+      if (!emailInput.value.trim() || !isValidEmail(emailInput.value)) {
+        emailInput.classList.add("is-invalid");
+        isValid = false;
+      } else {
+        emailInput.classList.remove("is-invalid");
+        emailInput.classList.add("is-valid");
+      }
+
+      // Password validation
+      if (!passwordInput.value.trim()) {
+        passwordInput.classList.add("is-invalid");
+        isValid = false;
+      } else {
+        passwordInput.classList.remove("is-invalid");
+        passwordInput.classList.add("is-valid");
+      }
+
+      if (!isValid) {
+        event.preventDefault();
+        alert("Please enter a valid email address and password.");
+      }
     });
-    
+
     // Real-time validation
-    emailInput.addEventListener('input', function() {
-        if (this.value.trim() && isValidEmail(this.value)) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-        } else {
-            this.classList.remove('is-valid');
-            this.classList.add('is-invalid');
-        }
+    emailInput.addEventListener("input", function () {
+      if (this.value.trim() && isValidEmail(this.value)) {
+        this.classList.remove("is-invalid");
+        this.classList.add("is-valid");
+      } else {
+        this.classList.remove("is-valid");
+        this.classList.add("is-invalid");
+      }
     });
-    
-    passwordInput.addEventListener('input', function() {
-        if (this.value.trim()) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-        } else {
-            this.classList.remove('is-valid');
-            this.classList.add('is-invalid');
-        }
+
+    passwordInput.addEventListener("input", function () {
+      if (this.value.trim()) {
+        this.classList.remove("is-invalid");
+        this.classList.add("is-valid");
+      } else {
+        this.classList.remove("is-valid");
+        this.classList.add("is-invalid");
+      }
     });
-});
+  });
 </script>
 {% endblock %}

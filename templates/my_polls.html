@@ -385,8 +385,8 @@ block content %}
       )
     ) {
       // Create a form to submit POST request for delete
-      const form = document.createElement('form');
-      form.method = 'POST';
+      const form = document.createElement("form");
+      form.method = "POST";
       form.action = `/delete-poll/${pollId}`;
       document.body.appendChild(form);
       form.submit();

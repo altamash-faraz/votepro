@@ -1,383 +1,426 @@
-{% extends "base.html" %}
-
-{% block title %}Register - VotePro{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Register - VotePro{% endblock %} {%
+block content %}
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="verification-container">
-                <div class="text-center mb-4">
-                    <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
-                    <h2 class="fw-bold">Join VotePro</h2>
-                    <p class="text-muted">Create your account to start voting and creating polls</p>
-                </div>
-
-                <form method="POST" novalidate id="registrationForm">
-                    <div class="mb-3">
-                        <label for="email" class="form-label fw-semibold">
-                            <i class="fas fa-envelope me-2"></i>Email Address
-                        </label>
-                        <input type="email" class="form-control" id="email" name="email" required 
-                               placeholder="Enter your email address">
-                        <div class="invalid-feedback">
-                            Please provide a valid email address.
-                        </div>
-                        <div class="form-text">
-                            <i class="fas fa-info-circle me-1"></i>
-                            We'll send you a verification code to this email
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label fw-semibold">
-                            <i class="fas fa-lock me-2"></i>Password
-                        </label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="password" name="password" required 
-                                   placeholder="Create a strong password">
-                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
-                                <i class="fas fa-eye" id="passwordToggleIcon"></i>
-                            </button>
-                        </div>
-                        <div class="invalid-feedback">
-                            Password must be at least 8 characters long.
-                        </div>
-                        <div class="password-strength mt-2" id="passwordStrength"></div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label fw-semibold">
-                            <i class="fas fa-lock me-2"></i>Confirm Password
-                        </label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required 
-                                   placeholder="Confirm your password">
-                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword')">
-                                <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
-                            </button>
-                        </div>
-                        <div class="invalid-feedback">
-                            Passwords do not match.
-                        </div>
-                    </div>
-
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="termsAgree" required>
-                        <label class="form-check-label" for="termsAgree">
-                            I agree to the <a href="#" class="text-primary">Terms of Service</a> and 
-                            <a href="#" class="text-primary">Privacy Policy</a>
-                        </label>
-                        <div class="invalid-feedback">
-                            You must agree to the terms to continue.
-                        </div>
-                    </div>
-
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="emailUpdates">
-                        <label class="form-check-label" for="emailUpdates">
-                            Send me updates about new features and polls
-                        </label>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-user-plus me-2"></i>Create Account
-                        </button>
-                    </div>
-                </form>
-
-                <div class="text-center mt-4">
-                    <p class="mb-0">Already have an account? 
-                        <a href="{{ url_for('login') }}" class="text-primary fw-semibold text-decoration-none">
-                            Sign in here
-                        </a>
-                    </p>
-                </div>
-
-                <div class="text-center mt-4">
-                    <hr class="my-3">
-                    <small class="text-muted">
-                        <i class="fas fa-shield-alt me-1"></i>
-                        Your data is protected with enterprise-grade security
-                    </small>
-                </div>
-            </div>
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="verification-container">
+        <div class="text-center mb-4">
+          <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+          <h2 class="fw-bold">Join VotePro</h2>
+          <p class="text-muted">
+            Create your account to start voting and creating polls
+          </p>
         </div>
+
+        <form method="POST" novalidate id="registrationForm">
+          <div class="mb-3">
+            <label for="email" class="form-label fw-semibold">
+              <i class="fas fa-envelope me-2"></i>Email Address
+            </label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              required
+              placeholder="Enter your email address"
+            />
+            <div class="invalid-feedback">
+              Please provide a valid email address.
+            </div>
+            <div class="form-text">
+              <i class="fas fa-info-circle me-1"></i>
+              We'll send you a verification code to this email
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label fw-semibold">
+              <i class="fas fa-lock me-2"></i>Password
+            </label>
+            <div class="input-group">
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                required
+                placeholder="Create a strong password"
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onclick="togglePassword('password')"
+              >
+                <i class="fas fa-eye" id="passwordToggleIcon"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback">
+              Password must be at least 8 characters long.
+            </div>
+            <div class="password-strength mt-2" id="passwordStrength"></div>
+          </div>
+
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label fw-semibold">
+              <i class="fas fa-lock me-2"></i>Confirm Password
+            </label>
+            <div class="input-group">
+              <input
+                type="password"
+                class="form-control"
+                id="confirmPassword"
+                name="confirmPassword"
+                required
+                placeholder="Confirm your password"
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onclick="togglePassword('confirmPassword')"
+              >
+                <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback">Passwords do not match.</div>
+          </div>
+
+          <div class="mb-3 form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="termsAgree"
+              required
+            />
+            <label class="form-check-label" for="termsAgree">
+              I agree to the
+              <a href="#" class="text-primary">Terms of Service</a> and
+              <a href="#" class="text-primary">Privacy Policy</a>
+            </label>
+            <div class="invalid-feedback">
+              You must agree to the terms to continue.
+            </div>
+          </div>
+
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="emailUpdates" />
+            <label class="form-check-label" for="emailUpdates">
+              Send me updates about new features and polls
+            </label>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center mt-4">
+          <p class="mb-0">
+            Already have an account?
+            <a
+              href="{{ url_for('login') }}"
+              class="text-primary fw-semibold text-decoration-none"
+            >
+              Sign in here
+            </a>
+          </p>
+        </div>
+
+        <div class="text-center mt-4">
+          <hr class="my-3" />
+          <small class="text-muted">
+            <i class="fas fa-shield-alt me-1"></i>
+            Your data is protected with enterprise-grade security
+          </small>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-function togglePassword(inputId) {
+  function togglePassword(inputId) {
     const passwordInput = document.getElementById(inputId);
-    const toggleIcon = document.getElementById(inputId + 'ToggleIcon');
-    
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleIcon.className = 'fas fa-eye-slash';
-    } else {
-        passwordInput.type = 'password';
-        toggleIcon.className = 'fas fa-eye';
-    }
-}
+    const toggleIcon = document.getElementById(inputId + "ToggleIcon");
 
-function isValidEmail(email) {
-    if (!email || email.trim().length === 0) {
-        return false;
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      toggleIcon.className = "fas fa-eye-slash";
+    } else {
+      passwordInput.type = "password";
+      toggleIcon.className = "fas fa-eye";
     }
-    
+  }
+
+  function isValidEmail(email) {
+    if (!email || email.trim().length === 0) {
+      return false;
+    }
+
     // Basic format check
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email.trim())) {
-        return false;
+      return false;
     }
-    
+
     const cleanEmail = email.trim();
-    
+
     // Check for multiple @ symbols
-    if (cleanEmail.split('@').length !== 2) {
-        return false;
+    if (cleanEmail.split("@").length !== 2) {
+      return false;
     }
-    
-    const [local, domain] = cleanEmail.split('@');
-    
+
+    const [local, domain] = cleanEmail.split("@");
+
     // Local part checks
     if (local.length === 0 || local.length > 64) {
-        return false;
+      return false;
     }
-    
+
     // Domain part checks
     if (domain.length === 0 || domain.length > 255) {
-        return false;
+      return false;
     }
-    
+
     // Domain must have at least one dot
-    if (!domain.includes('.')) {
-        return false;
+    if (!domain.includes(".")) {
+      return false;
     }
-    
+
     // Domain parts check
-    const domainParts = domain.split('.');
+    const domainParts = domain.split(".");
     for (const part of domainParts) {
-        if (part.length === 0 || !/^[a-zA-Z0-9-]+$/.test(part)) {
-            return false;
-        }
+      if (part.length === 0 || !/^[a-zA-Z0-9-]+$/.test(part)) {
+        return false;
+      }
     }
-    
+
     // Last part must be at least 2 characters (TLD)
     if (domainParts[domainParts.length - 1].length < 2) {
-        return false;
+      return false;
     }
-    
-    return true;
-}
 
-function checkPasswordStrength(password) {
+    return true;
+  }
+
+  function checkPasswordStrength(password) {
     let strength = 0;
     let feedback = [];
-    
-    if (password.length >= 8) strength++;
-    else feedback.push('At least 8 characters');
-    
-    if (/[a-z]/.test(password)) strength++;
-    else feedback.push('Lowercase letter');
-    
-    if (/[A-Z]/.test(password)) strength++;
-    else feedback.push('Uppercase letter');
-    
-    if (/[0-9]/.test(password)) strength++;
-    else feedback.push('Number');
-    
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-    else feedback.push('Special character');
-    
-    return { strength, feedback };
-}
 
-function updatePasswordStrength(password) {
-    const strengthDiv = document.getElementById('passwordStrength');
+    if (password.length >= 8) strength++;
+    else feedback.push("At least 8 characters");
+
+    if (/[a-z]/.test(password)) strength++;
+    else feedback.push("Lowercase letter");
+
+    if (/[A-Z]/.test(password)) strength++;
+    else feedback.push("Uppercase letter");
+
+    if (/[0-9]/.test(password)) strength++;
+    else feedback.push("Number");
+
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    else feedback.push("Special character");
+
+    return { strength, feedback };
+  }
+
+  function updatePasswordStrength(password) {
+    const strengthDiv = document.getElementById("passwordStrength");
     const { strength, feedback } = checkPasswordStrength(password);
-    
-    let strengthText = '';
-    let strengthClass = '';
-    
+
+    let strengthText = "";
+    let strengthClass = "";
+
     switch (strength) {
-        case 0:
-        case 1:
-            strengthText = 'Weak';
-            strengthClass = 'text-danger';
-            break;
-        case 2:
-        case 3:
-            strengthText = 'Medium';
-            strengthClass = 'text-warning';
-            break;
-        case 4:
-        case 5:
-            strengthText = 'Strong';
-            strengthClass = 'text-success';
-            break;
+      case 0:
+      case 1:
+        strengthText = "Weak";
+        strengthClass = "text-danger";
+        break;
+      case 2:
+      case 3:
+        strengthText = "Medium";
+        strengthClass = "text-warning";
+        break;
+      case 4:
+      case 5:
+        strengthText = "Strong";
+        strengthClass = "text-success";
+        break;
     }
-    
+
     if (password.length > 0) {
-        strengthDiv.innerHTML = `
+      strengthDiv.innerHTML = `
             <div class="d-flex align-items-center">
                 <div class="progress flex-grow-1 me-2" style="height: 5px;">
-                    <div class="progress-bar ${strengthClass.replace('text-', 'bg-')}" 
+                    <div class="progress-bar ${strengthClass.replace(
+                      "text-",
+                      "bg-"
+                    )}" 
                          style="width: ${(strength / 5) * 100}%"></div>
                 </div>
                 <small class="${strengthClass} fw-semibold">${strengthText}</small>
             </div>
-            ${feedback.length > 0 ? `<small class="text-muted">Missing: ${feedback.join(', ')}</small>` : ''}
+            ${
+              feedback.length > 0
+                ? `<small class="text-muted">Missing: ${feedback.join(
+                    ", "
+                  )}</small>`
+                : ""
+            }
         `;
     } else {
-        strengthDiv.innerHTML = '';
+      strengthDiv.innerHTML = "";
     }
-}
+  }
 
-// Form validation
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const termsCheckbox = document.getElementById('termsAgree');
-    const form = document.getElementById('registrationForm');
+  // Form validation
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
+    const termsCheckbox = document.getElementById("termsAgree");
+    const form = document.getElementById("registrationForm");
 
     // Form submission validation
-    form.addEventListener('submit', function(e) {
-        let isValid = true;
+    form.addEventListener("submit", function (e) {
+      let isValid = true;
 
-        // Email validation
-        if (!emailInput.value.trim() || !isValidEmail(emailInput.value)) {
-            emailInput.classList.add('is-invalid');
-            isValid = false;
-        }
+      // Email validation
+      if (!emailInput.value.trim() || !isValidEmail(emailInput.value)) {
+        emailInput.classList.add("is-invalid");
+        isValid = false;
+      }
 
-        // Password validation
-        if (!passwordInput.value.trim() || passwordInput.value.length < 8) {
-            passwordInput.classList.add('is-invalid');
-            isValid = false;
-        }
+      // Password validation
+      if (!passwordInput.value.trim() || passwordInput.value.length < 8) {
+        passwordInput.classList.add("is-invalid");
+        isValid = false;
+      }
 
-        // Confirm password validation
-        if (passwordInput.value !== confirmPasswordInput.value) {
-            confirmPasswordInput.classList.add('is-invalid');
-            isValid = false;
-        }
+      // Confirm password validation
+      if (passwordInput.value !== confirmPasswordInput.value) {
+        confirmPasswordInput.classList.add("is-invalid");
+        isValid = false;
+      }
 
-        // Terms validation
-        if (!termsCheckbox.checked) {
-            termsCheckbox.classList.add('is-invalid');
-            isValid = false;
-        }
+      // Terms validation
+      if (!termsCheckbox.checked) {
+        termsCheckbox.classList.add("is-invalid");
+        isValid = false;
+      }
 
-        if (!isValid) {
-            e.preventDefault();
-            alert('Please fix the errors in the form before submitting.');
-        }
+      if (!isValid) {
+        e.preventDefault();
+        alert("Please fix the errors in the form before submitting.");
+      }
     });
-    
+
     // Password strength checking
-    passwordInput.addEventListener('input', function() {
-        updatePasswordStrength(this.value);
-        
-        if (this.value.length >= 8) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-        } else if (this.value.length > 0) {
-            this.classList.add('is-invalid');
-            this.classList.remove('is-valid');
-        }
-        
-        // Re-check confirm password
-        if (confirmPasswordInput.value) {
-            validatePasswordMatch();
-        }
+    passwordInput.addEventListener("input", function () {
+      updatePasswordStrength(this.value);
+
+      if (this.value.length >= 8) {
+        this.classList.remove("is-invalid");
+        this.classList.add("is-valid");
+      } else if (this.value.length > 0) {
+        this.classList.add("is-invalid");
+        this.classList.remove("is-valid");
+      }
+
+      // Re-check confirm password
+      if (confirmPasswordInput.value) {
+        validatePasswordMatch();
+      }
     });
-    
+
     function validatePasswordMatch() {
-        if (passwordInput.value === confirmPasswordInput.value && passwordInput.value.length >= 8) {
-            confirmPasswordInput.classList.remove('is-invalid');
-            confirmPasswordInput.classList.add('is-valid');
-            return true;
-        } else if (confirmPasswordInput.value.length > 0) {
-            confirmPasswordInput.classList.add('is-invalid');
-            confirmPasswordInput.classList.remove('is-valid');
-            return false;
-        }
+      if (
+        passwordInput.value === confirmPasswordInput.value &&
+        passwordInput.value.length >= 8
+      ) {
+        confirmPasswordInput.classList.remove("is-invalid");
+        confirmPasswordInput.classList.add("is-valid");
+        return true;
+      } else if (confirmPasswordInput.value.length > 0) {
+        confirmPasswordInput.classList.add("is-invalid");
+        confirmPasswordInput.classList.remove("is-valid");
         return false;
+      }
+      return false;
     }
-    
-    confirmPasswordInput.addEventListener('input', validatePasswordMatch);
-    
-    form.addEventListener('submit', function(event) {
-        let isValid = true;
-        
-        // Email validation
-        if (!emailInput.value.trim()) {
-            emailInput.classList.add('is-invalid');
-            isValid = false;
-        } else if (!/\S+@\S+\.\S+/.test(emailInput.value)) {
-            emailInput.classList.add('is-invalid');
-            isValid = false;
-        } else {
-            emailInput.classList.remove('is-invalid');
-            emailInput.classList.add('is-valid');
-        }
-        
-        // Password validation
-        if (passwordInput.value.length < 8) {
-            passwordInput.classList.add('is-invalid');
-            isValid = false;
-        } else {
-            passwordInput.classList.remove('is-invalid');
-            passwordInput.classList.add('is-valid');
-        }
-        
-        // Password match validation
-        if (passwordInput.value !== confirmPasswordInput.value) {
-            confirmPasswordInput.classList.add('is-invalid');
-            isValid = false;
-        } else if (confirmPasswordInput.value.length >= 8) {
-            confirmPasswordInput.classList.remove('is-invalid');
-            confirmPasswordInput.classList.add('is-valid');
-        }
-        
-        // Terms validation
-        if (!termsCheckbox.checked) {
-            termsCheckbox.classList.add('is-invalid');
-            isValid = false;
-        } else {
-            termsCheckbox.classList.remove('is-invalid');
-            termsCheckbox.classList.add('is-valid');
-        }
-        
-        if (!isValid) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
+
+    confirmPasswordInput.addEventListener("input", validatePasswordMatch);
+
+    form.addEventListener("submit", function (event) {
+      let isValid = true;
+
+      // Email validation
+      if (!emailInput.value.trim()) {
+        emailInput.classList.add("is-invalid");
+        isValid = false;
+      } else if (!/\S+@\S+\.\S+/.test(emailInput.value)) {
+        emailInput.classList.add("is-invalid");
+        isValid = false;
+      } else {
+        emailInput.classList.remove("is-invalid");
+        emailInput.classList.add("is-valid");
+      }
+
+      // Password validation
+      if (passwordInput.value.length < 8) {
+        passwordInput.classList.add("is-invalid");
+        isValid = false;
+      } else {
+        passwordInput.classList.remove("is-invalid");
+        passwordInput.classList.add("is-valid");
+      }
+
+      // Password match validation
+      if (passwordInput.value !== confirmPasswordInput.value) {
+        confirmPasswordInput.classList.add("is-invalid");
+        isValid = false;
+      } else if (confirmPasswordInput.value.length >= 8) {
+        confirmPasswordInput.classList.remove("is-invalid");
+        confirmPasswordInput.classList.add("is-valid");
+      }
+
+      // Terms validation
+      if (!termsCheckbox.checked) {
+        termsCheckbox.classList.add("is-invalid");
+        isValid = false;
+      } else {
+        termsCheckbox.classList.remove("is-invalid");
+        termsCheckbox.classList.add("is-valid");
+      }
+
+      if (!isValid) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
     });
-    
+
     // Real-time validation
-    emailInput.addEventListener('input', function() {
-        if (this.value.trim() && isValidEmail(this.value)) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-        } else {
-            this.classList.remove('is-valid');
-            this.classList.add('is-invalid');
-        }
+    emailInput.addEventListener("input", function () {
+      if (this.value.trim() && isValidEmail(this.value)) {
+        this.classList.remove("is-invalid");
+        this.classList.add("is-valid");
+      } else {
+        this.classList.remove("is-valid");
+        this.classList.add("is-invalid");
+      }
     });
-    
-    termsCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-        }
+
+    termsCheckbox.addEventListener("change", function () {
+      if (this.checked) {
+        this.classList.remove("is-invalid");
+        this.classList.add("is-valid");
+      }
     });
-});
+  });
 </script>
 {% endblock %}

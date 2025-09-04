@@ -1,230 +1,251 @@
-{% extends "base.html" %}
-
-{% block title %}Verify Email - VotePro{% endblock %}
-
+{% extends "base.html" %} {% block title %}Verify Email - VotePro{% endblock %}
 {% block content %}
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="verification-container">
-                <div class="text-center mb-4">
-                    <i class="fas fa-envelope-open-text fa-3x text-primary mb-3"></i>
-                    <h2 class="fw-bold">Verify Your Email</h2>
-                    <p class="text-muted">We've sent a 6-digit verification code to your email address</p>
-                </div>
-
-                <form method="POST" novalidate>
-                    <div class="mb-4">
-                        <label for="token" class="form-label fw-semibold text-center d-block">
-                            <i class="fas fa-key me-2"></i>Verification Code
-                        </label>
-                        <input type="text" class="form-control otp-input" id="token" name="token" required 
-                               maxlength="6" placeholder="000000" autocomplete="off">
-                        <div class="invalid-feedback text-center">
-                            Please enter the 6-digit code sent to your email.
-                        </div>
-                        <div class="form-text text-center">
-                            <i class="fas fa-clock me-1"></i>
-                            Code expires in <span id="countdown">15:00</span>
-                        </div>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg" id="verifyBtn">
-                            <i class="fas fa-check me-2"></i>Verify Email
-                        </button>
-                    </div>
-                </form>
-
-                <div class="text-center mt-4">
-                    <p class="text-muted">Didn't receive the code?</p>
-                    <button class="btn btn-outline-primary" id="resendBtn" onclick="resendCode()" disabled>
-                        <i class="fas fa-redo me-2"></i>Resend Code
-                        <span id="resendCountdown">(60s)</span>
-                    </button>
-                </div>
-
-                <div class="text-center mt-4">
-                    <hr class="my-3">
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Having trouble? Check your spam folder or contact support
-                    </small>
-                </div>
-            </div>
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="verification-container">
+        <div class="text-center mb-4">
+          <i class="fas fa-envelope-open-text fa-3x text-primary mb-3"></i>
+          <h2 class="fw-bold">Verify Your Email</h2>
+          <p class="text-muted">
+            We've sent a 6-digit verification code to your email address
+          </p>
         </div>
+
+        <form method="POST" novalidate>
+          <div class="mb-4">
+            <label
+              for="token"
+              class="form-label fw-semibold text-center d-block"
+            >
+              <i class="fas fa-key me-2"></i>Verification Code
+            </label>
+            <input
+              type="text"
+              class="form-control otp-input"
+              id="token"
+              name="token"
+              required
+              maxlength="6"
+              placeholder="000000"
+              autocomplete="off"
+            />
+            <div class="invalid-feedback text-center">
+              Please enter the 6-digit code sent to your email.
+            </div>
+            <div class="form-text text-center">
+              <i class="fas fa-clock me-1"></i>
+              Code expires in <span id="countdown">15:00</span>
+            </div>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg" id="verifyBtn">
+              <i class="fas fa-check me-2"></i>Verify Email
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center mt-4">
+          <p class="text-muted">Didn't receive the code?</p>
+          <button
+            class="btn btn-outline-primary"
+            id="resendBtn"
+            onclick="resendCode()"
+            disabled
+          >
+            <i class="fas fa-redo me-2"></i>Resend Code
+            <span id="resendCountdown">(60s)</span>
+          </button>
+        </div>
+
+        <div class="text-center mt-4">
+          <hr class="my-3" />
+          <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            Having trouble? Check your spam folder or contact support
+          </small>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-let countdownTime = 15 * 60; // 15 minutes in seconds
-let resendTime = 60; // 1 minute for resend
+  let countdownTime = 15 * 60; // 15 minutes in seconds
+  let resendTime = 60; // 1 minute for resend
 
-// Countdown timer
-function updateCountdown() {
+  // Countdown timer
+  function updateCountdown() {
     const minutes = Math.floor(countdownTime / 60);
     const seconds = countdownTime % 60;
-    document.getElementById('countdown').textContent = 
-        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
+    document.getElementById("countdown").textContent = `${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
     if (countdownTime > 0) {
-        countdownTime--;
-        setTimeout(updateCountdown, 1000);
+      countdownTime--;
+      setTimeout(updateCountdown, 1000);
     } else {
-        document.getElementById('countdown').textContent = 'Expired';
-        document.getElementById('verifyBtn').disabled = true;
-        document.getElementById('verifyBtn').innerHTML = 
-            '<i class="fas fa-exclamation-triangle me-2"></i>Code Expired';
+      document.getElementById("countdown").textContent = "Expired";
+      document.getElementById("verifyBtn").disabled = true;
+      document.getElementById("verifyBtn").innerHTML =
+        '<i class="fas fa-exclamation-triangle me-2"></i>Code Expired';
     }
-}
+  }
 
-// Resend countdown
-function updateResendCountdown() {
-    const resendBtn = document.getElementById('resendBtn');
-    const resendCountdown = document.getElementById('resendCountdown');
-    
+  // Resend countdown
+  function updateResendCountdown() {
+    const resendBtn = document.getElementById("resendBtn");
+    const resendCountdown = document.getElementById("resendCountdown");
+
     if (resendTime > 0) {
-        resendCountdown.textContent = `(${resendTime}s)`;
-        resendBtn.disabled = true;
-        resendTime--;
-        setTimeout(updateResendCountdown, 1000);
+      resendCountdown.textContent = `(${resendTime}s)`;
+      resendBtn.disabled = true;
+      resendTime--;
+      setTimeout(updateResendCountdown, 1000);
     } else {
-        resendCountdown.textContent = '';
-        resendBtn.disabled = false;
-        resendBtn.innerHTML = '<i class="fas fa-redo me-2"></i>Resend Code';
+      resendCountdown.textContent = "";
+      resendBtn.disabled = false;
+      resendBtn.innerHTML = '<i class="fas fa-redo me-2"></i>Resend Code';
     }
-}
+  }
 
-function resendCode() {
-    const resendBtn = document.getElementById('resendBtn');
+  function resendCode() {
+    const resendBtn = document.getElementById("resendBtn");
     resendBtn.disabled = true;
-    resendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
-    
-    fetch('/resend-verification', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+    resendBtn.innerHTML =
+      '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+
+    fetch("/resend-verification", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
-    .then(response => response.json())
-    .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data.success) {
-            // Reset timers
-            resendTime = 60;
-            updateResendCountdown();
-            
-            // Show success message
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
-            alertDiv.innerHTML = `
+          // Reset timers
+          resendTime = 60;
+          updateResendCountdown();
+
+          // Show success message
+          const alertDiv = document.createElement("div");
+          alertDiv.className =
+            "alert alert-success alert-dismissible fade show mt-3";
+          alertDiv.innerHTML = `
                 <i class="fas fa-check-circle me-2"></i>
                 ${data.message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
-            document.querySelector('.verification-container').appendChild(alertDiv);
-            
-            // Auto-remove alert after 5 seconds
-            setTimeout(() => {
-                if (alertDiv && alertDiv.parentNode) {
-                    alertDiv.remove();
-                }
-            }, 5000);
-            
+          document
+            .querySelector(".verification-container")
+            .appendChild(alertDiv);
+
+          // Auto-remove alert after 5 seconds
+          setTimeout(() => {
+            if (alertDiv && alertDiv.parentNode) {
+              alertDiv.remove();
+            }
+          }, 5000);
         } else {
-            // Show error message
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
-            alertDiv.innerHTML = `
+          // Show error message
+          const alertDiv = document.createElement("div");
+          alertDiv.className =
+            "alert alert-danger alert-dismissible fade show mt-3";
+          alertDiv.innerHTML = `
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 ${data.message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
-            document.querySelector('.verification-container').appendChild(alertDiv);
-            
-            // Reset resend button
-            resendBtn.disabled = false;
-            resendBtn.innerHTML = '<i class="fas fa-redo me-2"></i>Resend Code';
+          document
+            .querySelector(".verification-container")
+            .appendChild(alertDiv);
+
+          // Reset resend button
+          resendBtn.disabled = false;
+          resendBtn.innerHTML = '<i class="fas fa-redo me-2"></i>Resend Code';
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to resend code. Please try again.');
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Failed to resend code. Please try again.");
         resendBtn.disabled = false;
         resendBtn.innerHTML = '<i class="fas fa-redo me-2"></i>Resend Code';
-    });
-}
+      });
+  }
 
-// Auto-focus and format OTP input
-document.addEventListener('DOMContentLoaded', function() {
-    const tokenInput = document.getElementById('token');
-    const form = document.querySelector('form');
-    
+  // Auto-focus and format OTP input
+  document.addEventListener("DOMContentLoaded", function () {
+    const tokenInput = document.getElementById("token");
+    const form = document.querySelector("form");
+
     // Auto-focus
     tokenInput.focus();
-    
+
     // Only allow numbers
-    tokenInput.addEventListener('input', function(e) {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        
-        if (this.value.length === 6) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-        } else if (this.value.length > 0) {
-            this.classList.remove('is-valid');
-        }
+    tokenInput.addEventListener("input", function (e) {
+      this.value = this.value.replace(/[^0-9]/g, "");
+
+      if (this.value.length === 6) {
+        this.classList.remove("is-invalid");
+        this.classList.add("is-valid");
+      } else if (this.value.length > 0) {
+        this.classList.remove("is-valid");
+      }
     });
-    
+
     // Format as user types
-    tokenInput.addEventListener('keyup', function(e) {
-        // Auto-submit when 6 digits are entered
-        if (this.value.length === 6 && !/[^0-9]/.test(this.value)) {
-            // Optional: auto-submit after a brief delay
-            setTimeout(() => {
-                if (this.value.length === 6) {
-                    form.submit();
-                }
-            }, 500);
-        }
+    tokenInput.addEventListener("keyup", function (e) {
+      // Auto-submit when 6 digits are entered
+      if (this.value.length === 6 && !/[^0-9]/.test(this.value)) {
+        // Optional: auto-submit after a brief delay
+        setTimeout(() => {
+          if (this.value.length === 6) {
+            form.submit();
+          }
+        }, 500);
+      }
     });
-    
+
     // Form validation
-    form.addEventListener('submit', function(event) {
-        const token = tokenInput.value;
-        
-        if (!token || token.length !== 6 || /[^0-9]/.test(token)) {
-            tokenInput.classList.add('is-invalid');
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
-        }
-        
-        tokenInput.classList.remove('is-invalid');
-        tokenInput.classList.add('is-valid');
-        
-        // Show loading state
-        const submitBtn = document.getElementById('verifyBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
+    form.addEventListener("submit", function (event) {
+      const token = tokenInput.value;
+
+      if (!token || token.length !== 6 || /[^0-9]/.test(token)) {
+        tokenInput.classList.add("is-invalid");
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+      }
+
+      tokenInput.classList.remove("is-invalid");
+      tokenInput.classList.add("is-valid");
+
+      // Show loading state
+      const submitBtn = document.getElementById("verifyBtn");
+      submitBtn.disabled = true;
+      submitBtn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
     });
-    
+
     // Start countdown
     updateCountdown();
     updateResendCountdown();
-});
+  });
 
-// Paste handling for OTP
-document.getElementById('token').addEventListener('paste', function(e) {
+  // Paste handling for OTP
+  document.getElementById("token").addEventListener("paste", function (e) {
     e.preventDefault();
-    const paste = (e.clipboardData || window.clipboardData).getData('text');
-    const numbers = paste.replace(/[^0-9]/g, '').substring(0, 6);
+    const paste = (e.clipboardData || window.clipboardData).getData("text");
+    const numbers = paste.replace(/[^0-9]/g, "").substring(0, 6);
     this.value = numbers;
-    
+
     if (numbers.length === 6) {
-        this.classList.remove('is-invalid');
-        this.classList.add('is-valid');
+      this.classList.remove("is-invalid");
+      this.classList.add("is-valid");
     }
-});
+  });
 </script>
 {% endblock %}

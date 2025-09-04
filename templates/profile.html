@@ -1,169 +1,195 @@
-{% extends "base.html" %}
-
-{% block title %}Profile - VotePro{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Profile - VotePro{% endblock %} {%
+block content %}
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-0"><i class="fas fa-user me-2"></i>My Profile</h2>
-            <p class="text-muted mb-0">Manage your account and view your activity</p>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0"><i class="fas fa-user me-2"></i>My Profile</h2>
+      <p class="text-muted mb-0">Manage your account and view your activity</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- User Information Card -->
+    <div class="col-lg-4 mb-4">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-user-circle me-2"></i>Account Information
+          </h5>
         </div>
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <div
+              class="avatar-placeholder mx-auto mb-3"
+              style="
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, #3498db, #2ecc71);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              <i class="fas fa-user fa-2x text-white"></i>
+            </div>
+            <h6 class="fw-bold">{{ user.email }}</h6>
+            <small class="text-muted">
+              <i class="fas fa-calendar-alt me-1"></i>
+              Joined {{ user.created_at.strftime('%B %d, %Y') }}
+            </small>
+          </div>
+
+          <div class="text-center">
+            <span class="badge bg-success">
+              <i class="fas fa-check-circle me-1"></i>Verified Account
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
-        <!-- User Information Card -->
-        <div class="col-lg-4 mb-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-user-circle me-2"></i>Account Information
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="text-center mb-3">
-                        <div class="avatar-placeholder mx-auto mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #3498db, #2ecc71); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-user fa-2x text-white"></i>
-                        </div>
-                        <h6 class="fw-bold">{{ user.email }}</h6>
-                        <small class="text-muted">
-                            <i class="fas fa-calendar-alt me-1"></i>
-                            Joined {{ user.created_at.strftime('%B %d, %Y') }}
-                        </small>
-                    </div>
-                    
-                    <div class="text-center">
-                        <span class="badge bg-success">
-                            <i class="fas fa-check-circle me-1"></i>Verified Account
-                        </span>
-                    </div>
-                </div>
+    <!-- Statistics Cards -->
+    <div class="col-lg-8">
+      <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+          <div class="card text-center border-primary">
+            <div class="card-body">
+              <i class="fas fa-poll fa-2x text-primary mb-2"></i>
+              <h4 class="fw-bold text-primary">{{ polls_created }}</h4>
+              <p class="mb-0 text-muted">Polls Created</p>
             </div>
+          </div>
         </div>
-
-        <!-- Statistics Cards -->
-        <div class="col-lg-8">
-            <div class="row mb-4">
-                <div class="col-md-4 mb-3">
-                    <div class="card text-center border-primary">
-                        <div class="card-body">
-                            <i class="fas fa-poll fa-2x text-primary mb-2"></i>
-                            <h4 class="fw-bold text-primary">{{ polls_created }}</h4>
-                            <p class="mb-0 text-muted">Polls Created</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card text-center border-success">
-                        <div class="card-body">
-                            <i class="fas fa-play-circle fa-2x text-success mb-2"></i>
-                            <h4 class="fw-bold text-success">{{ active_polls }}</h4>
-                            <p class="mb-0 text-muted">Active Polls</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card text-center border-info">
-                        <div class="card-body">
-                            <i class="fas fa-vote-yea fa-2x text-info mb-2"></i>
-                            <h4 class="fw-bold text-info">{{ votes_cast }}</h4>
-                            <p class="mb-0 text-muted">Votes Cast</p>
-                        </div>
-                    </div>
-                </div>
+        <div class="col-md-4 mb-3">
+          <div class="card text-center border-success">
+            <div class="card-body">
+              <i class="fas fa-play-circle fa-2x text-success mb-2"></i>
+              <h4 class="fw-bold text-success">{{ active_polls }}</h4>
+              <p class="mb-0 text-muted">Active Polls</p>
             </div>
-
-            <!-- Recent Voting Activity -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-history me-2"></i>Recent Voting Activity
-                    </h5>
-                </div>
-                <div class="card-body">
-                    {% if recent_votes %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Poll</th>
-                                    <th>Your Vote</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for vote in recent_votes %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ vote.poll.title }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ vote.poll.category }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary">{{ vote.option.option_text }}</span>
-                                    </td>
-                                    <td>{{ vote.voted_at.strftime('%Y-%m-%d') }}</td>
-                                    <td>
-                                        <a href="{{ url_for('view_poll', poll_id=vote.poll.id) }}" 
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye me-1"></i>View Results
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-vote-yea fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">No voting activity yet. Start by participating in some polls!</p>
-                        <a href="{{ url_for('index') }}" class="btn btn-primary">
-                            <i class="fas fa-poll me-2"></i>Browse Polls
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+          </div>
         </div>
+        <div class="col-md-4 mb-3">
+          <div class="card text-center border-info">
+            <div class="card-body">
+              <i class="fas fa-vote-yea fa-2x text-info mb-2"></i>
+              <h4 class="fw-bold text-info">{{ votes_cast }}</h4>
+              <p class="mb-0 text-muted">Votes Cast</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Voting Activity -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-history me-2"></i>Recent Voting Activity
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if recent_votes %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Poll</th>
+                  <th>Your Vote</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for vote in recent_votes %}
+                <tr>
+                  <td>
+                    <strong>{{ vote.poll.title }}</strong>
+                    <br />
+                    <small class="text-muted">{{ vote.poll.category }}</small>
+                  </td>
+                  <td>
+                    <span class="badge bg-primary"
+                      >{{ vote.option.option_text }}</span
+                    >
+                  </td>
+                  <td>{{ vote.voted_at.strftime('%Y-%m-%d') }}</td>
+                  <td>
+                    <a
+                      href="{{ url_for('view_poll', poll_id=vote.poll.id) }}"
+                      class="btn btn-sm btn-outline-primary"
+                    >
+                      <i class="fas fa-eye me-1"></i>View Results
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <i class="fas fa-vote-yea fa-3x text-muted mb-3"></i>
+            <p class="text-muted">
+              No voting activity yet. Start by participating in some polls!
+            </p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+              <i class="fas fa-poll me-2"></i>Browse Polls
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Account Actions -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-cog me-2"></i>Quick Actions
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-2">
-                            <a href="{{ url_for('create_poll') }}" class="btn btn-primary w-100">
-                                <i class="fas fa-plus me-2"></i>Create New Poll
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <a href="{{ url_for('my_polls') }}" class="btn btn-outline-primary w-100">
-                                <i class="fas fa-list me-2"></i>My Polls
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <a href="{{ url_for('index') }}" class="btn btn-outline-success w-100">
-                                <i class="fas fa-poll me-2"></i>Browse Polls
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger w-100">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- Account Actions -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-cog me-2"></i>Quick Actions
+          </h5>
         </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-2">
+              <a
+                href="{{ url_for('create_poll') }}"
+                class="btn btn-primary w-100"
+              >
+                <i class="fas fa-plus me-2"></i>Create New Poll
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a
+                href="{{ url_for('my_polls') }}"
+                class="btn btn-outline-primary w-100"
+              >
+                <i class="fas fa-list me-2"></i>My Polls
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a
+                href="{{ url_for('index') }}"
+                class="btn btn-outline-success w-100"
+              >
+                <i class="fas fa-poll me-2"></i>Browse Polls
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a
+                href="{{ url_for('logout') }}"
+                class="btn btn-outline-danger w-100"
+              >
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
