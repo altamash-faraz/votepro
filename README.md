@@ -45,49 +45,49 @@ Try the application with these features:
 
 ![VotePro Homepage](screenshots/homepage.png)
 
-_Beautiful, modern interface with active polls and statistics - featuring the welcome page with gradient design and call-to-action buttons_
+*Beautiful, modern interface with active polls and statistics - featuring the welcome page with gradient design and call-to-action buttons*
 
 ### 📊 Poll Creation Interface
 
 ![Create Poll](screenshots/create-poll.png)
 
-_Intuitive poll creation form with multiple options, categories, and deadline settings_
+*Intuitive poll creation form with multiple options, categories, and deadline settings*
 
 ### 🗳️ Voting Interface
 
 ![Voting Interface](screenshots/voting-interface.png)
 
-_Seamless one-click voting system with real-time updates and clean option selection_
+*Seamless one-click voting system with real-time updates and clean option selection*
 
 ### 📊 Poll Results & Analytics
 
 ![Poll Results](screenshots/poll-results.png)
 
-_Interactive charts and detailed voting analytics with real-time percentage calculations_
+*Interactive charts and detailed voting analytics with real-time percentage calculations*
 
-### 📧 Email Verification System
+### 📧 Email Verification
 
 ![Email Verification](screenshots/email-verification.png)
 
-_Secure email verification for account registration with user-friendly interface_
+*Secure email verification for account registration with user-friendly interface*
 
 ### 🎛️ User Dashboard
 
 ![User Dashboard](screenshots/dashboard.png)
 
-_Comprehensive poll management dashboard showing user's created polls and analytics_
+*Comprehensive poll management dashboard showing user's created polls and analytics*
 
-### 🔐 Authentication System
+### 🔐 Login & Registration
 
 ![Login & Register](screenshots/login-register.png)
 
-_Clean and secure login/registration interface with email verification_
+*Clean and secure login/registration interface with email verification*
 
-### 📱 Mobile Responsive Design
+### 📱 Mobile Responsive
 
 ![Mobile Responsive](screenshots/mobile-responsive.png)
 
-_Fully responsive design optimized for mobile devices and tablets_
+*Fully responsive design optimized for mobile devices and tablets*
 
 ---
 
