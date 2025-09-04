@@ -8,6 +8,7 @@ import secrets
 import os
 from functools import wraps
 import random
+import re
 
 # Load environment variables
 load_dotenv()
@@ -102,6 +103,11 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def is_valid_email(email):
+    """Validate email format using regex"""
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
 def generate_token():
     return str(random.randint(100000, 999999))
 
@@ -125,13 +131,6 @@ Your email verification code is: {token}
 Please enter this code to complete your registration.
 
 This code expires in 15 minutes.'''
-    else:  # vote_otp
-        subject = 'VotePro - Voting OTP'
-        body = f'''Your voting OTP code is: {token}
-
-Please enter this code to cast your vote.
-
-This code expires in 5 minutes.'''
     
     # Debug: Check email configuration
     print(f"\n=== EMAIL DEBUG INFO ===")
@@ -190,8 +189,18 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        email = request.form['email']
+        email = request.form['email'].strip().lower()
         password = request.form['password']
+        
+        # Validate email format
+        if not is_valid_email(email):
+            flash('Please enter a valid email address.', 'danger')
+            return render_template('register.html')
+        
+        # Check password strength
+        if len(password) < 8:
+            flash('Password must be at least 8 characters long.', 'danger')
+            return render_template('register.html')
         
         # Check if user already exists
         if User.query.filter_by(email=email).first():
@@ -261,14 +270,20 @@ def verify_email():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
+        email = request.form['email'].strip().lower()
         password = request.form['password']
+        
+        # Validate email format
+        if not is_valid_email(email):
+            flash('Please enter a valid email address.', 'danger')
+            return render_template('login.html')
         
         user = User.query.filter_by(email=email).first()
         
         if user and bcrypt.check_password_hash(user.password_hash, password):
             if not user.is_verified:
                 flash('Please verify your email first.', 'warning')
+                session['pending_verification'] = user.id
                 return redirect(url_for('verify_email'))
             
             session['user_id'] = user.id
@@ -350,87 +365,36 @@ def view_poll(poll_id):
 
 @app.route('/vote/<int:poll_id>', methods=['POST'])
 @login_required
-def initiate_vote(poll_id):
+def vote_on_poll(poll_id):
     poll = Poll.query.get_or_404(poll_id)
+    option_id = request.json.get('option_id')
     
     # Check if poll is active
     if not poll.is_active or make_timezone_aware(poll.deadline) < datetime.now(UTC):
         return jsonify({'success': False, 'message': 'Poll is no longer active'})
     
-    # Check if user already voted
-    user = User.query.get(session['user_id'])
-    existing_votes = Vote.query.filter_by(poll_id=poll_id).all()
+    # Check if option exists in this poll
+    option = PollOption.query.filter_by(id=option_id, poll_id=poll_id).first()
+    if not option:
+        return jsonify({'success': False, 'message': 'Invalid option selected'})
     
-    # Generate voting token for this session
-    voting_token = secrets.token_hex(16)
-    session[f'voting_token_{poll_id}'] = voting_token
+    # Generate unique voting token for this user-poll combination
+    user_id = session['user_id']
+    voting_token = f"user_{user_id}_poll_{poll_id}"
     
-    # Generate OTP
-    otp = generate_token()
-    verification = VerificationToken(
-        user_id=session['user_id'],
-        token=otp,
-        token_type='vote_otp',
-        expires_at=datetime.now(UTC) + timedelta(minutes=5),
-        poll_id=poll_id
-    )
-    db.session.add(verification)
-    db.session.commit()
-    
-    # Send OTP
-    try:
-        send_verification_email(user.email, otp, 'vote_otp')
-        message = 'OTP sent to your email. Please verify to cast your vote.'
-    except Exception as e:
-        message = f'Email sending failed. Your OTP code is: {otp}'
-        print(f"Email error during voting: {e}")
-    
-    return jsonify({
-        'success': True,
-        'message': message,
-        'poll_id': poll_id
-    })
-
-@app.route('/verify-vote', methods=['POST'])
-@login_required
-def verify_vote():
-    poll_id = request.json['poll_id']
-    option_id = request.json['option_id']
-    otp = request.json['otp']
-    
-    # Verify OTP
-    verification = VerificationToken.query.filter_by(
-        user_id=session['user_id'],
-        token=otp,
-        token_type='vote_otp',
-        poll_id=poll_id
-    ).first()
-    
-    if not verification or make_timezone_aware(verification.expires_at) < datetime.now(UTC):
-        return jsonify({'success': False, 'message': 'Invalid or expired OTP'})
-    
-    # Check if voting token exists
-    voting_token = session.get(f'voting_token_{poll_id}')
-    if not voting_token:
-        return jsonify({'success': False, 'message': 'Voting session expired'})
-    
-    # Check if already voted with this token
+    # Check if user already voted in this poll
     existing_vote = Vote.query.filter_by(poll_id=poll_id, voter_token=voting_token).first()
     if existing_vote:
         return jsonify({'success': False, 'message': 'You have already voted in this poll'})
     
-    # Cast vote
+    # Cast vote directly (no OTP needed for registered users)
     vote = Vote(
         poll_id=poll_id,
         option_id=option_id,
         voter_token=voting_token
     )
     db.session.add(vote)
-    db.session.delete(verification)
     db.session.commit()
-    
-    # Clear voting token
-    session.pop(f'voting_token_{poll_id}', None)
     
     return jsonify({'success': True, 'message': 'Vote cast successfully!'})
 
@@ -491,6 +455,54 @@ def toggle_poll(poll_id):
     status = 'activated' if poll.is_active else 'deactivated'
     flash(f'Poll {status} successfully!', 'success')
     return redirect(url_for('my_polls'))
+
+@app.route('/delete-poll/<int:poll_id>', methods=['POST'])
+@login_required
+def delete_poll(poll_id):
+    poll = Poll.query.get_or_404(poll_id)
+    
+    # Check if user owns this poll
+    if poll.creator_id != session['user_id']:
+        flash('You can only delete your own polls.', 'danger')
+        return redirect(url_for('my_polls'))
+    
+    # Delete the poll (cascade will handle related records)
+    db.session.delete(poll)
+    db.session.commit()
+    
+    flash('Poll deleted successfully!', 'success')
+    return redirect(url_for('my_polls'))
+
+@app.route('/profile')
+@login_required
+def user_profile():
+    user = User.query.get(session['user_id'])
+    
+    # Get user statistics
+    polls_created = Poll.query.filter_by(creator_id=user.id).count()
+    active_polls = Poll.query.filter_by(creator_id=user.id, is_active=True).count()
+    
+    # Get votes cast by user
+    user_votes = Vote.query.filter(Vote.voter_token.like(f'user_{user.id}_poll_%')).all()
+    votes_cast = len(user_votes)
+    
+    # Get recent voting activity
+    recent_votes = []
+    for vote in user_votes[-10:]:  # Last 10 votes
+        poll = Poll.query.get(vote.poll_id)
+        option = PollOption.query.get(vote.option_id)
+        recent_votes.append({
+            'poll': poll,
+            'option': option,
+            'voted_at': vote.created_at
+        })
+    
+    return render_template('profile.html', 
+                         user=user, 
+                         polls_created=polls_created,
+                         active_polls=active_polls,
+                         votes_cast=votes_cast,
+                         recent_votes=recent_votes)
 
 # Initialize database
 with app.app_context():

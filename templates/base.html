@@ -272,6 +272,10 @@
                             <i class="fas fa-user me-1"></i>Account
                         </a>
                         <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('user_profile') }}">
+                                <i class="fas fa-user-circle me-1"></i>Profile
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('logout') }}">
                                 <i class="fas fa-sign-out-alt me-1"></i>Logout
                             </a></li>
@@ -324,7 +328,6 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p class="mb-0">&copy; 2025 VotePro. Built with Flask and Bootstrap.</p>
-                    <small class="text-muted">Demonstrating full-stack web development skills</small>
                 </div>
             </div>
         </div>

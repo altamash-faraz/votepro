@@ -4,7 +4,7 @@
 
 ![VotePro Logo](https://img.shields.io/badge/VotePro-Polling%20Platform-blue?style=for-the-badge&logo=voting&logoColor=white)
 
-**A modern, secure Flask-based polling application with OTP verification and real-time results**
+**A modern, secure Flask-based polling application with seamless voting and real-time results**
 
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-votepro.onrender.com-success?style=for-the-badge)](https://votepro.onrender.com)
 [![GitHub Repo](https://img.shields.io/badge/📂%20GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/altamash-faraz/votepro)
@@ -20,20 +20,22 @@
 
 ## 🌟 **Live Application**
 
-### � **Access VotePro:**
+### 🌐 **Access VotePro:**
 
 - **🌍 Live Website:** [https://votepro.onrender.com](https://votepro.onrender.com)
 - **📱 Mobile Responsive:** Fully optimized for all devices
 - **🔒 HTTPS Secured:** SSL encryption enabled
 
-### 🎮 **Demo Credentials:**
+### 🎮 **Demo Features:**
 
-Try the application with these test features:
+Try the application with these features:
 
 - Create polls with multiple options
-- Real-time voting with OTP verification
-- Email notifications and verification
-- Responsive dashboard and analytics
+- Instant voting for registered users (no OTP required)
+- Email verification for new accounts
+- Real-time poll results and analytics
+- User profile and voting history
+- Poll management (activate/deactivate/delete)
 
 ---
 
@@ -45,7 +47,7 @@ Try the application with these test features:
 
 _Beautiful, modern interface with active polls and statistics - featuring the welcome page with gradient design and call-to-action buttons_
 
-### � Poll Creation Interface
+### 📊 Poll Creation Interface
 
 ![Create Poll](screenshots/create-poll.png)
 
@@ -55,7 +57,7 @@ _Intuitive poll creation form with multiple options, categories, and deadline se
 
 ![Voting Interface](screenshots/voting-interface.png)
 
-_Secure OTP-based voting system with real-time updates and clean option selection_
+_Seamless one-click voting system with real-time updates and clean option selection_
 
 ### 📊 Poll Results & Analytics
 
@@ -67,7 +69,7 @@ _Interactive charts and detailed voting analytics with real-time percentage calc
 
 ![Email Verification](screenshots/email-verification.png)
 
-_Secure email-based OTP verification for voting with user-friendly interface_
+_Secure email verification for account registration with user-friendly interface_
 
 ### 🎛️ User Dashboard
 
@@ -93,8 +95,9 @@ _Fully responsive design optimized for mobile devices and tablets_
 
 ### 🔐 **Security & Authentication**
 
-- ✅ **Email Verification** - Secure account registration with OTP
-- ✅ **OTP Voting System** - Prevents duplicate voting and ensures authenticity
+- ✅ **Email Verification** - Secure account registration with email verification
+- ✅ **Instant Voting** - One-click voting for registered users with duplicate prevention
+- ✅ **User Profile** - Personal dashboard with voting history and statistics
 - ✅ **Session Management** - Secure user sessions with Flask-Bcrypt
 - ✅ **CSRF Protection** - Built-in security measures
 
@@ -129,7 +132,7 @@ _Fully responsive design optimized for mobile devices and tablets_
 - **🌶️ Flask 3.0** - Lightweight web framework
 - **🗄️ SQLAlchemy** - Database ORM with PostgreSQL
 - **🔐 Flask-Bcrypt** - Password hashing and security
-- **📧 Flask-Mail** - Email functionality and OTP delivery
+- **📧 Flask-Mail** - Email functionality for account verification
 
 ### **Frontend**
 
@@ -214,7 +217,7 @@ votepro/
 
 ### **� Advanced Security**
 
-- Two-factor authentication via email OTP
+- Email verification for secure account creation
 - Secure session management
 - SQL injection protection
 - CSRF token validation

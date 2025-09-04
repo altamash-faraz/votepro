@@ -13,7 +13,7 @@
                     <p class="text-muted">Sign in to your VotePro account</p>
                 </div>
 
-                <form method="POST" novalidate>
+                <form method="POST" novalidate id="loginForm">
                     <div class="mb-3">
                         <label for="email" class="form-label fw-semibold">
                             <i class="fas fa-envelope me-2"></i>Email Address
@@ -91,9 +91,14 @@ function togglePassword(inputId) {
     }
 }
 
+function isValidEmail(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email.trim());
+}
+
 // Form validation
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
+    const form = document.getElementById('loginForm');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     
@@ -101,12 +106,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let isValid = true;
         
         // Email validation
-        if (!emailInput.value.trim()) {
+        if (!emailInput.value.trim() || !isValidEmail(emailInput.value)) {
             emailInput.classList.add('is-invalid');
-            isValid = false;
-        } else if (!/\S+@\S+\.\S+/.test(emailInput.value)) {
-            emailInput.classList.add('is-invalid');
-            emailInput.nextElementSibling.textContent = 'Please enter a valid email address.';
             isValid = false;
         } else {
             emailInput.classList.remove('is-invalid');
@@ -115,34 +116,37 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Password validation
         if (!passwordInput.value.trim()) {
-            passwordInput.closest('.input-group').classList.add('is-invalid');
             passwordInput.classList.add('is-invalid');
             isValid = false;
         } else {
-            passwordInput.closest('.input-group').classList.remove('is-invalid');
             passwordInput.classList.remove('is-invalid');
             passwordInput.classList.add('is-valid');
         }
         
         if (!isValid) {
             event.preventDefault();
-            event.stopPropagation();
+            alert('Please enter a valid email address and password.');
         }
     });
     
     // Real-time validation
     emailInput.addEventListener('input', function() {
-        if (this.value.trim() && /\S+@\S+\.\S+/.test(this.value)) {
+        if (this.value.trim() && isValidEmail(this.value)) {
             this.classList.remove('is-invalid');
             this.classList.add('is-valid');
+        } else {
+            this.classList.remove('is-valid');
+            this.classList.add('is-invalid');
         }
     });
     
     passwordInput.addEventListener('input', function() {
         if (this.value.trim()) {
-            this.closest('.input-group').classList.remove('is-invalid');
             this.classList.remove('is-invalid');
             this.classList.add('is-valid');
+        } else {
+            this.classList.remove('is-valid');
+            this.classList.add('is-invalid');
         }
     });
 });

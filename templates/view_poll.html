@@ -161,75 +161,6 @@
   </div>
 </div>
 
-<!-- OTP Verification Modal -->
-<div
-  class="modal fade"
-  id="otpModal"
-  tabindex="-1"
-  aria-labelledby="otpModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="otpModalLabel">
-          <i class="fas fa-shield-alt me-2"></i>Verify Your Vote
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
-      </div>
-      <div class="modal-body text-center">
-        <div class="mb-4">
-          <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
-          <p>
-            We've sent a verification code to your email. Enter it below to
-            confirm your vote.
-          </p>
-        </div>
-
-        <form id="otpVerificationForm">
-          <input type="hidden" id="selectedOptionId" name="option_id" />
-          <div class="mb-3">
-            <label for="otpCode" class="form-label fw-semibold"
-              >Verification Code</label
-            >
-            <input
-              type="text"
-              class="form-control otp-input text-center"
-              id="otpCode"
-              name="otp"
-              maxlength="6"
-              placeholder="000000"
-              required
-            />
-          </div>
-
-          <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-success">
-              <i class="fas fa-check me-2"></i>Confirm Vote
-            </button>
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              onclick="resendOTP()"
-            >
-              <i class="fas fa-redo me-2"></i>Resend Code
-            </button>
-          </div>
-        </form>
-
-        <!-- Demo notice -->
-        <div class="alert alert-info mt-3 small">
-          <i class="fas fa-info-circle me-1"></i>
-          <strong>Demo:</strong> Check browser console for OTP code
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %} {% block scripts %}
 <script>
   let currentChart = null;
@@ -341,67 +272,40 @@
                   return;
               }
 
+              // Show confirmation before voting
+              if (!confirm('Are you sure you want to cast your vote? This action cannot be undone.')) {
+                  return;
+              }
+
               try {
                   const response = await fetch('/vote/{{ poll.id }}', {
                       method: 'POST',
                       headers: {
                           'Content-Type': 'application/json',
-                      }
-                  });
-
-                  const data = await response.json();
-
-                  if (data.success) {
-                      // Show OTP modal
-                      document.getElementById('selectedOptionId').value = selectedOption.value;
-                      const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
-                      otpModal.show();
-                  } else {
-                      alert(data.message);
-                  }
-              } catch (error) {
-                  console.error('Error:', error);
-                  alert('An error occurred while initiating vote');
-              }
-          });
-      }
-
-      // OTP Verification
-      const otpForm = document.getElementById('otpVerificationForm');
-      if (otpForm) {
-          otpForm.addEventListener('submit', async function(e) {
-              e.preventDefault();
-
-              const formData = new FormData(this);
-              const otpData = {
-                  poll_id: {{ poll.id }},
-                  option_id: parseInt(formData.get('option_id')),
-                  otp: formData.get('otp')
-              };
-
-              try {
-                  const response = await fetch('/verify-vote', {
-                      method: 'POST',
-                      headers: {
-                          'Content-Type': 'application/json',
                       },
-                      body: JSON.stringify(otpData)
+                      body: JSON.stringify({
+                          option_id: parseInt(selectedOption.value)
+                      })
                   });
 
                   const data = await response.json();
 
                   if (data.success) {
                       alert('Vote cast successfully!');
-                      location.reload();
+                      location.reload(); // Refresh to show updated results
                   } else {
                       alert(data.message);
                   }
               } catch (error) {
                   console.error('Error:', error);
-                  alert('An error occurred while verifying vote');
+                  alert('An error occurred while casting your vote');
               }
           });
       }
+
+      }
+
+  // Auto-refresh results every 30 seconds
   });
 
   function resendOTP() {

@@ -13,7 +13,7 @@
                     <p class="text-muted">Create your account to start voting and creating polls</p>
                 </div>
 
-                <form method="POST" novalidate>
+                <form method="POST" novalidate id="registrationForm">
                     <div class="mb-3">
                         <label for="email" class="form-label fw-semibold">
                             <i class="fas fa-envelope me-2"></i>Email Address
@@ -123,6 +123,12 @@ function togglePassword(inputId) {
     }
 }
 
+function isValidEmail(email) {
+    // More comprehensive email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email.trim());
+}
+
 function checkPasswordStrength(password) {
     let strength = 0;
     let feedback = [];
@@ -193,6 +199,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
     const termsCheckbox = document.getElementById('termsAgree');
+    const form = document.getElementById('registrationForm');
+
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+
+        // Email validation
+        if (!emailInput.value.trim() || !isValidEmail(emailInput.value)) {
+            emailInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Password validation
+        if (!passwordInput.value.trim() || passwordInput.value.length < 8) {
+            passwordInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Confirm password validation
+        if (passwordInput.value !== confirmPasswordInput.value) {
+            confirmPasswordInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Terms validation
+        if (!termsCheckbox.checked) {
+            termsCheckbox.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fix the errors in the form before submitting.');
+        }
+    });
     
     // Password strength checking
     passwordInput.addEventListener('input', function() {
@@ -277,9 +318,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Real-time validation
     emailInput.addEventListener('input', function() {
-        if (this.value.trim() && /\S+@\S+\.\S+/.test(this.value)) {
+        if (this.value.trim() && isValidEmail(this.value)) {
             this.classList.remove('is-invalid');
             this.classList.add('is-valid');
+        } else {
+            this.classList.remove('is-valid');
+            this.classList.add('is-invalid');
         }
     });
     

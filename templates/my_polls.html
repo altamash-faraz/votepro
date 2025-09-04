@@ -384,9 +384,12 @@ block content %}
         "Are you sure you want to delete this poll? This action cannot be undone."
       )
     ) {
-      // In a real app, this would make an API call to delete the poll
-      alert("Delete functionality would be implemented here");
-      // window.location.href = `/delete-poll/${pollId}`;
+      // Create a form to submit POST request for delete
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `/delete-poll/${pollId}`;
+      document.body.appendChild(form);
+      form.submit();
     }
   }
 
