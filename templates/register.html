@@ -124,9 +124,54 @@ function togglePassword(inputId) {
 }
 
 function isValidEmail(email) {
-    // More comprehensive email validation
+    if (!email || email.trim().length === 0) {
+        return false;
+    }
+    
+    // Basic format check
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email.trim());
+    if (!emailRegex.test(email.trim())) {
+        return false;
+    }
+    
+    const cleanEmail = email.trim();
+    
+    // Check for multiple @ symbols
+    if (cleanEmail.split('@').length !== 2) {
+        return false;
+    }
+    
+    const [local, domain] = cleanEmail.split('@');
+    
+    // Local part checks
+    if (local.length === 0 || local.length > 64) {
+        return false;
+    }
+    
+    // Domain part checks
+    if (domain.length === 0 || domain.length > 255) {
+        return false;
+    }
+    
+    // Domain must have at least one dot
+    if (!domain.includes('.')) {
+        return false;
+    }
+    
+    // Domain parts check
+    const domainParts = domain.split('.');
+    for (const part of domainParts) {
+        if (part.length === 0 || !/^[a-zA-Z0-9-]+$/.test(part)) {
+            return false;
+        }
+    }
+    
+    // Last part must be at least 2 characters (TLD)
+    if (domainParts[domainParts.length - 1].length < 2) {
+        return false;
+    }
+    
+    return true;
 }
 
 function checkPasswordStrength(password) {

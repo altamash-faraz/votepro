@@ -104,9 +104,76 @@ def login_required(f):
     return decorated_function
 
 def is_valid_email(email):
-    """Validate email format using regex"""
+    """Validate email format using regex with strict domain validation"""
+    if not email or len(email.strip()) == 0:
+        return False
+    
+    # Basic format check
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(pattern, email) is not None
+    
+    # Basic format check
+    if not re.match(pattern, email.strip()):
+        return False
+    
+    # Additional checks
+    email = email.strip()
+    
+    # Check for multiple @ symbols
+    if email.count('@') != 1:
+        return False
+    
+    local, domain = email.split('@')
+    
+    # Local part checks
+    if len(local) == 0 or len(local) > 64:
+        return False
+    
+    # Domain part checks
+    if len(domain) == 0 or len(domain) > 255:
+        return False
+    
+    # Domain must have at least one dot
+    if '.' not in domain:
+        return False
+    
+    # Domain parts check
+    domain_parts = domain.split('.')
+    for part in domain_parts:
+        if len(part) == 0 or not re.match(r'^[a-zA-Z0-9-]+$', part):
+            return False
+        # Domain parts cannot start or end with hyphen
+        if part.startswith('-') or part.endswith('-'):
+            return False
+    
+    # Last part must be at least 2 characters (TLD) and should be common TLD or country code
+    tld = domain_parts[-1].lower()
+    if len(tld) < 2:
+        return False
+    
+    # List of common valid TLDs (you can expand this list)
+    valid_tlds = {
+        'com', 'org', 'net', 'edu', 'gov', 'mil', 'int', 'co', 'io', 'ai', 'tech',
+        'info', 'biz', 'name', 'pro', 'museum', 'coop', 'aero', 'jobs', 'mobi',
+        'travel', 'tel', 'cat', 'asia', 'xxx', 'post', 'geo', 'tv', 'me', 'cc',
+        # Country codes (most common ones)
+        'us', 'uk', 'ca', 'au', 'de', 'fr', 'it', 'es', 'nl', 'br', 'in', 'cn',
+        'jp', 'kr', 'ru', 'mx', 'ar', 'cl', 've', 'pe', 'co', 'ec', 'bo', 'py',
+        'uy', 'gf', 'sr', 'gy', 'fk', 'za', 'ng', 'eg', 'ma', 'dz', 'ly', 'sd',
+        'et', 'ke', 'tz', 'ug', 'rw', 'bi', 'dj', 'so', 'er', 'cf', 'td', 'ne',
+        'ml', 'bf', 'sn', 'gm', 'gw', 'gn', 'sl', 'lr', 'ci', 'gh', 'tg', 'bj'
+    }
+    
+    # Check if TLD is in our valid list (for stricter validation)
+    # For production, you might want to make this less strict or use an API to validate domains
+    if len(tld) > 4:  # Allow longer TLDs like 'museum', 'travel', etc.
+        # For very long TLDs, do basic validation
+        if not re.match(r'^[a-zA-Z]+$', tld):
+            return False
+    elif tld not in valid_tlds:
+        # For shorter TLDs, check against our list
+        return False
+    
+    return True
 
 def generate_token():
     return str(random.randint(100000, 999999))
@@ -192,7 +259,7 @@ def register():
         email = request.form['email'].strip().lower()
         password = request.form['password']
         
-        # Validate email format
+        # Validate email format first
         if not is_valid_email(email):
             flash('Please enter a valid email address.', 'danger')
             return render_template('register.html')
@@ -203,43 +270,59 @@ def register():
             return render_template('register.html')
         
         # Check if user already exists
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered. Please login.', 'danger')
-            return redirect(url_for('login'))
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            if existing_user.is_verified:
+                flash('Email already registered. Please login.', 'danger')
+                return redirect(url_for('login'))
+            else:
+                # User exists but not verified, allow them to verify
+                session['pending_verification'] = existing_user.id
+                flash('Email already registered but not verified. Please check your email for verification code.', 'info')
+                return redirect(url_for('verify_email'))
         
-        # Create new user
-        password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-        user = User(email=email, password_hash=password_hash)
-        db.session.add(user)
-        db.session.commit()
-        
-        # Generate verification token
-        token = generate_token()
-        verification = VerificationToken(
-            user_id=user.id,
-            token=token,
-            token_type='email_verify',
-            expires_at=datetime.now(UTC) + timedelta(minutes=15)
-        )
-        db.session.add(verification)
-        db.session.commit()
-        
-        # Send verification email
+        # Only create new user and send email if email is valid and doesn't exist
         try:
+            # Create new user
+            password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+            user = User(email=email, password_hash=password_hash)
+            db.session.add(user)
+            db.session.commit()
+            
+            # Generate verification token
+            token = generate_token()
+            verification = VerificationToken(
+                user_id=user.id,
+                token=token,
+                token_type='email_verify',
+                expires_at=datetime.now(UTC) + timedelta(minutes=15)
+            )
+            db.session.add(verification)
+            db.session.commit()
+            
+            # Send verification email only to valid emails
             send_verification_email(email, token, 'email_verify')
             flash('Registration successful! Check your email for verification code.', 'success')
+            session['pending_verification'] = user.id
+            return redirect(url_for('verify_email'))
+            
         except Exception as e:
-            flash(f'Registration successful! However, email sending failed. Your verification code is: {token}', 'warning')
-            print(f"Email error during registration: {e}")
-        
-        session['pending_verification'] = user.id
-        return redirect(url_for('verify_email'))
+            # If email sending fails, delete the user and tokens to prevent orphaned data
+            if 'user' in locals():
+                db.session.delete(user)
+            if 'verification' in locals():
+                db.session.delete(verification)
+            db.session.commit()
+            flash('Registration failed. Please check your email address and try again.', 'danger')
+            print(f"Registration error: {e}")
+            return render_template('register.html')
     
     return render_template('register.html')
 
 @app.route('/verify-email', methods=['GET', 'POST'])
 def verify_email():
     if 'pending_verification' not in session:
+        flash('No pending email verification found.', 'warning')
         return redirect(url_for('register'))
     
     if request.method == 'POST':
@@ -255,17 +338,62 @@ def verify_email():
         if verification and make_timezone_aware(verification.expires_at) > datetime.now(UTC):
             user = User.query.get(user_id)
             user.is_verified = True
+            
+            # Clean up verification token
             db.session.delete(verification)
             db.session.commit()
             
             session.pop('pending_verification', None)
             session['user_id'] = user.id
-            flash('Email verified successfully!', 'success')
+            flash('Email verified successfully! Welcome to VotePro!', 'success')
             return redirect(url_for('index'))
         else:
-            flash('Invalid or expired verification code.', 'danger')
+            flash('Invalid or expired verification code. Please try again.', 'danger')
     
     return render_template('verify_email.html')
+
+@app.route('/resend-verification', methods=['POST'])
+def resend_verification():
+    if 'pending_verification' not in session:
+        return jsonify({'success': False, 'message': 'No pending verification found'})
+    
+    user_id = session['pending_verification']
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'})
+    
+    if user.is_verified:
+        return jsonify({'success': False, 'message': 'Email already verified'})
+    
+    try:
+        # Delete old verification tokens
+        old_tokens = VerificationToken.query.filter_by(
+            user_id=user_id,
+            token_type='email_verify'
+        ).all()
+        for token in old_tokens:
+            db.session.delete(token)
+        
+        # Generate new verification token
+        new_token = generate_token()
+        verification = VerificationToken(
+            user_id=user.id,
+            token=new_token,
+            token_type='email_verify',
+            expires_at=datetime.now(UTC) + timedelta(minutes=15)
+        )
+        db.session.add(verification)
+        db.session.commit()
+        
+        # Send verification email
+        send_verification_email(user.email, new_token, 'email_verify')
+        
+        return jsonify({'success': True, 'message': 'Verification code sent successfully!'})
+        
+    except Exception as e:
+        print(f"Error resending verification: {e}")
+        return jsonify({'success': False, 'message': 'Failed to send verification code. Please try again later.'})
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
