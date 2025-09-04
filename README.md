@@ -150,7 +150,7 @@ Try the application with these features:
 
 ---
 
-## � **Quick Start**
+## 🚀 **Quick Start**
 
 ### **1. 🌐 Try Live Demo**
 
@@ -188,9 +188,9 @@ For full functionality, configure Gmail SMTP:
 
 ---
 
-## � **Project Structure**
+## 📁 **Project Structure**
 
-```
+```text
 votepro/
 ├── 📁 templates/          # HTML templates
 │   ├── base.html         # Base layout
@@ -215,7 +215,7 @@ votepro/
 - Engagement metrics and participation rates
 - Beautiful progress bars and visual indicators
 
-### **� Advanced Security**
+### **🔒 Advanced Security**
 
 - Email verification for secure account creation
 - Secure session management
@@ -282,7 +282,7 @@ Give a ⭐️ if this project helped you!
 
 <div align="center">
 
-**� [Try VotePro Live](https://votepro.onrender.com) | 📂 [View Source Code](https://github.com/altamash-faraz/votepro)**
+**🚀 [Try VotePro Live](https://votepro.onrender.com) | 📂 [View Source Code](https://github.com/altamash-faraz/votepro)**
 
 _Built with modern web technologies for secure, scalable polling solutions_
 
